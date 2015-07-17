@@ -3,7 +3,7 @@
 /**
  * Plugin Name: myRealPage IDX Listings
  * Description: Embeds myRealPage IDX and Listings solution into WordPress. Uses shortcodes. Create a post or page and use integrated shortcode button to launch myRealPage Listings Shortcode Wizard and generate a shortcode based on your choice of listing content, as well as functional and visual preferences.
- * Version: 1.0.0
+ * Version: 0.9.0
  * Author: myRealPage (support@myrealpage.com)
  * Author URI: http://myrealpage.com
  **/
@@ -44,10 +44,10 @@ if (!class_exists('MRPListing')) {
             $this->loadOptions();
 
             // load configuration as an option, or if not present, grab the default
-            //$config = $this->getOption(self::CONFIG_OPT_NAME);
-            $config = ''; 
+            $config = $this->getOption(self::CONFIG_OPT_NAME);
+            //$config = ''; 
             $this->config = $config && strlen(trim($config))
-                ? get_object_vars(@json_decode($config))
+                ? json_decode($config,true)
                 : $this->defaultConfig();
             $this->logger = new \MRPIDX\Logger("MRP IDX", $this->getOption(self::DEBUG_OPT_NAME));
             $this->mrpData = array("head" => "", "description" => "", "title" => "", "body" => "");
@@ -342,7 +342,7 @@ if (!class_exists('MRPListing')) {
             //error_log( "replacedWP" . print_r( $post, true ) );
 
             // check whether we have an MRP shortcode, and process it
-            if (has_shortcode($post->post_content, 'mrp')) {
+            if ( isset($post) && has_shortcode($post->post_content, 'mrp')) {
 
                 // parse out shortcode attributes and create a context object
                 $attrs = shortcode_parse_atts($post->post_content);
@@ -354,7 +354,7 @@ if (!class_exists('MRPListing')) {
                 };
                 $attrs = array_map($cleanAttributes, $attrs);
                 $this->debug("Parsed Shortcode: " . print_r($attrs, true));
-                error_log("Parsed Shortcode: " . print_r($attrs, true));
+                //error_log("Parsed Shortcode: " . print_r($attrs, true));
                 $attrs = $attrs +
                     array(
                         "pageName"        => $this->getPageName(),
@@ -363,7 +363,7 @@ if (!class_exists('MRPListing')) {
                         "googleMapApiKey" => $this->getOption(self::GOOGLE_MAP_API_KEY)
                     );
                     
-				error_log( "$attrs: ". print_r( $attrs, true ) );
+				//error_log( "$attrs: ". print_r( $attrs, true ) );
                 $context = new \MRPIDX\Context($attrs);
                                 
                 if ($this->skipEmbed()) {
@@ -448,7 +448,7 @@ if (!class_exists('MRPListing')) {
             $uri  = $_SERVER["REQUEST_URI"];
             
             $this->logger->debug( "This is managed URL: ". $uri . "|" . $this->isManagedUrl($uri) );
-            error_log( "This is managed URL: ". $uri . "|" . $this->isManagedUrl($uri) );
+            //error_log( "This is managed URL: ". $uri . "|" . $this->isManagedUrl($uri) );
 
 
             // nothing to do if this isn't a managed URL
@@ -458,14 +458,14 @@ if (!class_exists('MRPListing')) {
             
             // strip off the extension part, and grab our page name from the slug
             list($pagename, $extension) = $this->processManagedUrl($uri);
-            error_log( "handleRequest: " . $pagename . ":" . $extension );
+            //error_log( "handleRequest: " . $pagename . ":" . $extension );
             
             $searchname = $pagename;
             
             // in case we get a subpage, i.e. something/somewhere as $pagename, use the last segment
             if( strripos( "$pagename", '/' ) ) {
 	            $searchname = substr( $pagename, strripos( "$pagename", '/' ) + 1 );
-	            error_log( "SEARCHNAME: ". $searchname );
+	            //error_log( "SEARCHNAME: ". $searchname );
             }
             
             // find the page, based on page name
@@ -481,7 +481,7 @@ if (!class_exists('MRPListing')) {
                 if (stripos($requestUri, '?')) {
                     $slug = substr($slug, 0, stripos($requestUri, '?') - 1);
                 }
-                error_log( "DB RESULT: " . print_r( $result, true ) );
+                //error_log( "DB RESULT: " . print_r( $result, true ) );
                 $context = array(
                     "post_parent" => $result->ID,
                     "post_type"   => $result->post_type
@@ -637,10 +637,10 @@ if (!class_exists('MRPListing')) {
 				if( $inqueryString ) {
 					$requestUri .= "?" . $inqueryString;
 				}
-	        	error_log( "IDX_SEARCH URL: " . $requestUri );
+	        	//error_log( "IDX_SEARCH URL: " . $requestUri );
             }
 
-            error_log("Direct Proxying: " . $requestUri);
+            //error_log("Direct Proxying: " . $requestUri);
 
             //  use raw POST data from stdin rather than the $_POST superglobal
             $client->proxy(
@@ -726,7 +726,7 @@ if (!class_exists('MRPListing')) {
                         
             if ($this->isManagedUrl($url)) {
                 list($pageName, $extension) = $this->processManagedUrl($url);
-                error_log( $pageName . ":" . $extension . ":" . $url );
+                //error_log( $pageName . ":" . $extension . ":" . $url );
             }
             if (substr($pageName, -1) == '/') {
                 $pageName = substr($pageName, 0, strlen($pageName) - 1);
@@ -754,9 +754,9 @@ if (!class_exists('MRPListing')) {
 			    '\/evow\/.*'                     => false,
 			    '\/browse\/.*'                   => false,
 			    '^\/wps\/'                       => false,
-			    '\/[0-9]+\.search(\?|\/)'        => false,
-			    '\/[0-9]+\.vowsearch(\?|\/)'     => false,
-			    '\/vowcategory\.form'            => false,
+			    '\/[0-9]+\.search.*'             => false,
+			    '\/[0-9]+\.vowsearch.*'          => false,
+			    '\/vowcategory\.form.*'          => false,
 			    '\/idx\.search'                  => false,
 			    '\/listing.*'                    => false,
 			    '\/searchresults\.form'          => false,
@@ -792,13 +792,7 @@ if (!class_exists('MRPListing')) {
          */
         public function updateConfig()
         {
-        	if( true ) {
-        		// don't auto update yet
-	        	return;
-        	}
-        
-        
-            // fetch the file
+        	// fetch the file
             $client = new \MRPIDX\HTTP\Client( "http://" . MRPIDX\InlineClient::SERVER . self::CONFIG_LOCATION);
             $client->makeRequest();
             $response = $client->getResponse();
@@ -809,7 +803,7 @@ if (!class_exists('MRPListing')) {
                 $json = json_decode($content,true);
                 if (json_last_error() != JSON_ERROR_NONE) {
                     //$this->logger->warn("Config JSON is invalid: " . self::CONFIG_LOCATION);
-                    error_log("Config JSON is invalid: " . self::CONFIG_LOCATION . " : " . json_last_error() );
+                    //error_log("Config JSON is invalid: " . self::CONFIG_LOCATION . " : " . json_last_error() );
                     return;
                 }
                 $config = $json;
@@ -823,7 +817,7 @@ if (!class_exists('MRPListing')) {
                     $this->logger->debug("Updating config from " . $current . " to " . $config["version"]);
                 }
                 else {
-	                error_log( "Config update skipped: version same or lower: " . $config["version"] );
+	                //error_log( "Config update skipped: version same or lower: " . $config["version"] );
                 }
             } else {
                 $this->logger->warn("Could not update configuration from: " . self::CONFIG_LOCATION);

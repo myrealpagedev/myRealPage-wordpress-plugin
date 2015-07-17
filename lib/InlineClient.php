@@ -8,7 +8,6 @@ class InlineClient {
 
     //const SERVER = 'listings.myrealpage.com';
     const SERVER = '96.49.208.17';
-/*     const RES_SERVER = 'res.myrealpage.com'; */
     const RES_SERVER = \MRPIDX\InlineClient::SERVER;
 
     protected $context;
@@ -101,7 +100,7 @@ class InlineClient {
 
         $this->client = $client;
         $this->logger->debug("Request headers: " . print_r($client->getHeaders(), true));
-        error_log("Request headers: " . print_r($client->getHeaders(), true));
+        //error_log("Request headers: " . print_r($client->getHeaders(), true));
         $client->makeRequest();
         $response = $client->getResponse();
         
@@ -142,11 +141,15 @@ class InlineClient {
             // root the the location to the local site
             $location = $response->getHeader('Location');
             error_log( "REDIRECT: " . $location );
-            $location = preg_replace('@http://(.+?)/(.*)@', 'http://'.$_SERVER['HTTP_HOST'].'/$2', $location);
+            $location = preg_replace('@http://(.+?)/(.*)@', ( $this->isSecure() ? 'https://' : 'http://' ) .$_SERVER['HTTP_HOST'].'/$2', $location);
             error_log( "REDIRECT2: " . $location );
             $this->client->setResponseHeader("Location", $location);
         }
     }
+    
+    private function isSecure() {
+		return	(!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || $_SERVER['SERVER_PORT'] == 443;
+	}
 
     private function parseInlineContent()
     {
@@ -171,7 +174,7 @@ class InlineClient {
         
         // if we are using the "the_title" hook, then, the page will most likely display the title of the post already, so let's not duplicate
         // TODO: make it an option??
-        //$body = preg_replace( '@<h1 class=\"mrp-listing-title \".*?<\/h1>@', '', $body );
+        $body = preg_replace( '@<h1 class=\"mrp-listing-title \".*?<\/h1>@', '', $body );
         
         $title = html_entity_decode(trim($this->getStringBetween($content, "<TITLE>", "</TITLE>")));
         $description = html_entity_decode(trim($this->getStringBetween($content,  "<META name=\"description\" content=\"", "\">")));
@@ -251,7 +254,7 @@ class InlineClient {
         
         $cookies = $response->getCookies();
         foreach( $cookies as $cookie ) {
-	        error_log( "COOKIE: " . $cookie );
+	        //error_log( "COOKIE: " . $cookie );
 	        header( "Set-Cookie :" . $cookie, false );
         }
         //error_log( "COOKIES: " . print_r( $response->getCookies(), true ));
@@ -361,7 +364,7 @@ class InlineClient {
         
         
         $this->logger->debug("Target MRP URL: " . $url );
-        error_log("Target MRP URL: " . $url );
+        //error_log("Target MRP URL: " . $url );
 
         return $url;
     }

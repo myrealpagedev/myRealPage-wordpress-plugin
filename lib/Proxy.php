@@ -30,6 +30,10 @@ class Proxy {
             "X-WordPress-Theme: " . get_template()
         );
     }
+    
+    private function isSecure() {
+		return	(!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || $_SERVER['SERVER_PORT'] == 443;
+	}
 
     public function doProxy($uri, $postParams = array())
     {    
@@ -45,7 +49,7 @@ class Proxy {
         if ($response->isRedirect() && $response->hasHeader("Location")) {
            	
            	$location = $response->getHeader('Location');
-           	$location = preg_replace('@http://(.+?)/(.*)@', 'http://'.$_SERVER['HTTP_HOST'].'/$2', $location);
+           	$location = preg_replace('@http://(.+?)/(.*)@', ( $this->isSecure() ? 'https://' : 'http://' ) .$_SERVER['HTTP_HOST'].'/$2', $location);
 
             header("HTTP/1.1 " . $response->getResponseCodeWithString());
             header("Location: " . $location);
@@ -64,11 +68,13 @@ class Proxy {
         }
 
         // ensure any relative references to wps-listings.css are made absolute
-        $content = str_replace(
+        /*
+$content = str_replace(
             '"/wps-listings.css',
             '"http://listings.myrealpage.com/wps-listings.css',
             $content
         );
+*/
 
         // touch up the content length header, since the above search and replace may have broken it
         if ($response->getInfo('download_content_length')) {
@@ -143,6 +149,8 @@ class Proxy {
         if ($this->getCookieAsHeader()) {
             $headers[] = $this->getCookieAsHeader();
         }
+        
+        error_log( "PROXY HEADERS: (" . $uri . ") " . print_r( $headers, true ) );
 
         $client->setHeaders($headers);
         if (count($postParams)) {

@@ -112,7 +112,7 @@ class FakePage
 		 */
 		$post->ID = -1;
 		
-		$post->post_parent = $this->post_parent;
+		$post->post_parent = isset( $this->post_parent ) ? $this->post_parent : null;
 		
 		/**
 		 * Static means a page, not a post.
