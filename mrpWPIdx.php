@@ -289,8 +289,23 @@ if (!class_exists('MRPListing')) {
 
         public function customTheTitle($title, $id = null)
         {
-        	if( $id == -1 && isset( $this->mrpData ) ) { // we have our synthetic page
-        		return $this->mrpData["title"];
+        	if( $id == -1 ) { // we have our synthetic page
+
+        		
+        		// special case for navigation:
+				if( preg_match( '/.*\/searchresults\.form.*/i', $_SERVER['REQUEST_URI']) ) {
+	    			if( $_GET['_pg'] != '' ) {
+	        			return $title . ' [p.' . $_GET['_pg'] . ']';
+	    			}
+	    			else {
+	    				return $title . ' [results]';
+	    			}
+				}
+				
+				$regex = isset($this->config["replaceable_titles"]) ? $this->config["replaceable_titles"] : "";
+				if( $regex != "" && preg_match($regex, $_SERVER['REQUEST_URI']) && isset($this->mrpData["title"]) ) {
+	        		return $this->mrpData["title"];
+        		}
 	        	//error_log( "SYNTHETIC TITLE!!!: " . $this->mrpData["title"] );
         	}
             return $title;

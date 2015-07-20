@@ -6,8 +6,8 @@ use MRPIDX\HTTP\Client;
 
 class InlineClient {
 
-    const SERVER = 'listings.myrealpage.com';
-    //const SERVER = '96.49.208.17';
+    //const SERVER = 'listings.myrealpage.com';
+    const SERVER = '96.49.208.17';
     const RES_SERVER = \MRPIDX\InlineClient::SERVER;
 
     protected $context;
