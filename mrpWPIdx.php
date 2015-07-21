@@ -291,6 +291,10 @@ if (!class_exists('MRPListing')) {
         {
         	if( $id == -1 ) { // we have our synthetic page
 
+        		// special case for /evow/, we also make sure that we are not in listing details, in which case other rules apply (i.e. customTitle() check)
+        		if( preg_match( '/.*\/evow\/.*/i', $_SERVER['REQUEST_URI'] ) && $this->customTitle($title) == $title ) {
+	        		return 'Found Listings';
+        		}
         		
         		// special case for navigation:
 				if( preg_match( '/.*\/searchresults\.form.*/i', $_SERVER['REQUEST_URI']) ) {
@@ -302,6 +306,7 @@ if (!class_exists('MRPListing')) {
 	    			}
 				}
 				
+				// make sure we are responsible for the title as well
 				$regex = isset($this->config["replaceable_titles"]) ? $this->config["replaceable_titles"] : "";
 				if( $regex != "" && preg_match($regex, $_SERVER['REQUEST_URI']) && isset($this->mrpData["title"]) ) {
 	        		return $this->mrpData["title"];
