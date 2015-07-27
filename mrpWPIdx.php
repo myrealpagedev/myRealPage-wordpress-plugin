@@ -366,6 +366,7 @@ if (!class_exists('MRPListing')) {
 
                 // parse out shortcode attributes and create a context object
                 $attrs = shortcode_parse_atts($post->post_content);
+				
                 unset($attrs[0]);
                 unset($attrs[1]);
 
@@ -385,10 +386,13 @@ if (!class_exists('MRPListing')) {
                     
 				//error_log( "$attrs: ". print_r( $attrs, true ) );
                 $context = new \MRPIDX\Context($attrs);
-                                
-                if ($this->skipEmbed()) {
-                    //return;
+                
+                //error_log( "ATTS: " . print_r( $attrs, true ) );
+                if( isset($attrs["searchform_def"]) && $attrs["searchform_def"] != "" ) {	
+	                // no remote call on search form IDX              	
+	              	return;  
                 }
+
 
                 $client = new \MRPIDX\InlineClient($this->logger, $context);
                 $client->processInline();
@@ -427,16 +431,19 @@ if (!class_exists('MRPListing')) {
          **/
         public function replaceContent($attrs, $content = '')
         {
-            if ($this->skipEmbed()) {
-                $attrs["embed"] = "";
-            }
-
-            if (isset($attrs["searchform_def"]) && $attrs["searchform_def"] != "" &&
-                isset($attrs["embed"]) && $attrs["embed"] != ""
-            ) {
+            if (isset($attrs["searchform_def"]) && $attrs["searchform_def"] != "" ) {
                 // create a client for operating within the new (local) context
-                $client = new \MRPIDX\InlineClient($this->logger, new \MRPIDX\Context($attrs));
-                return $client->getEmbeddedFormJS();
+                //$client = new \MRPIDX\InlineClient($this->logger, new \MRPIDX\Context($attrs));
+                //return $client->getEmbeddedFormJS();
+                
+                $script1= "\n<script src='//" . \MRPIDX\InlineClient::RES_SERVER . 
+                	"/wps/rest/" . $attrs["account_id"] . "/l/recip/tmpl2.js'></script>\n";
+                $script2 = "<script src='//" . \MRPIDX\InlineClient::RES_SERVER . 
+                	"/wps/js/ng/v2/listings/listings-wp-button.js' id='idx-button-script' data-account='" . 
+                		$attrs["account_id"] . "'></script>\n";
+                
+                return $script1 . $script2;
+                
             } else {
                 $content = $this->mrpData["body"];
                 return $content;
