@@ -6,8 +6,8 @@ use MRPIDX\HTTP\Client;
 
 class InlineClient {
 
-    //const SERVER = 'listings.myrealpage.com';
-    const SERVER = '96.49.208.17';
+    const SERVER = 'listings.myrealpage.com';
+    //const SERVER = '96.49.208.17';
     const RES_SERVER = \MRPIDX\InlineClient::SERVER;
 
     protected $context;
@@ -346,7 +346,7 @@ class InlineClient {
         }
 
         $initAttr = trim($context->get("initAttr"));
-        if (strlen($initAttr) && stripos($url, "?") == false) {
+        if (!$context->get("extension") && strlen($initAttr) && stripos($url, "?") == false) {
             $query = preg_replace('/~/', '=', $initAttr);
             $query = preg_replace('/,/', '&', $query);
             $url .= '?' . $query;

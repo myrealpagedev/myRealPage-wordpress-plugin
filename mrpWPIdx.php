@@ -3,7 +3,7 @@
 /**
  * Plugin Name: myRealPage IDX Listings
  * Description: Embeds myRealPage IDX and Listings solution into WordPress. Uses shortcodes. Create a post or page and use integrated shortcode button to launch myRealPage Listings Shortcode Wizard and generate a shortcode based on your choice of listing content, as well as functional and visual preferences.
- * Version: 0.9.0
+ * Version: 0.9.5
  * Author: myRealPage (support@myrealpage.com)
  * Author URI: http://myrealpage.com
  **/
@@ -164,13 +164,13 @@ if (!class_exists('MRPListing')) {
             add_action('wp_head', array(&$this, 'addHeader'));
 
             // replace title with custom MRP one.
-            add_filter('wp_title', array(&$this, 'customTitle'), 11);
+            add_filter('wp_title', array(&$this, 'customTitle'), 1);
             
             // this needs attention: this can be called for a variety of posts
             // within ANY url to get titles, for generating menus, etc. This 
             // may be detrimental, but if enabled allows proper generation of
             // breadcrumbs, etc.
-            add_filter('the_title', array(&$this, 'customTheTitle'), 10, 2 );
+            add_filter('the_title', array(&$this, 'customTheTitle'), 1, 2 );
             
             // add debug/error logs to end of page contents
             add_action("wp_footer", array(&$this, "outputLogs"));
@@ -440,7 +440,7 @@ if (!class_exists('MRPListing')) {
                 	"/wps/rest/" . $attrs["account_id"] . "/l/recip/tmpl2.js'></script>\n";
                 $script2 = "<script src='//" . \MRPIDX\InlineClient::RES_SERVER . 
                 	"/wps/js/ng/v2/listings/listings-wp-button.js' id='idx-button-script' data-account='" . 
-                		$attrs["account_id"] . "'></script>\n";
+                		$attrs["account_id"] . "' data-init-attr='" . ($attrs["init_attr"] ? $attrs["init_attr"] : "" ) . "'></script>\n";
                 
                 return $script1 . $script2;
                 
@@ -589,9 +589,10 @@ if (!class_exists('MRPListing')) {
             // issue a redirect if we are seeing /wps/recip/XX/idx.search 
             // this may happen if a vow search is loaded for editing
             // Also: only GET check, because 'POST' is used for actual searching
-            if ( $_SERVER['REQUEST_METHOD'] == 'GET' && preg_match('@^/wps/recip/\d+/(idx.search|search.form)@i', $requestUri)) {
+            if ( $_SERVER['REQUEST_METHOD'] == 'GET' && preg_match('@^/wps/recip/\d+/(.+.search|search.form)@i', $requestUri)) {
                 preg_match('@^/wps/recip/(.*)@', $requestUri, $matches);
                 if (isset($matches[1])) {
+                	//header("HTTP/1.1 301 Moved Permanently");
                     header('Location: /recip-' . $matches[1]);
                     die();
                 }
