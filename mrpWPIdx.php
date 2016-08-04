@@ -3,14 +3,19 @@
 /**
  * Plugin Name: myRealPage IDX Listings
  * Description: Embeds myRealPage IDX and Listings solution into WordPress. Uses shortcodes. Create a post or page and use integrated shortcode button to launch myRealPage Listings Shortcode Wizard and generate a shortcode based on your choice of listing content, as well as functional and visual preferences.
- * Version: 0.9.5
+ * Version: 0.9.7
  * Author: myRealPage (support@myrealpage.com)
  * Author URI: http://myrealpage.com
  **/
 
+// PHP >= 5.4.x needed
+if (PHP_MAJOR_VERSION < 5 || (PHP_MAJOR_VERSION == 5 && PHP_MINOR_VERSION < 4)) {
+    die('PHP Version 5.4 or above is required for this plugin.');
+}
+
 if (!class_exists('MRPListing')) {
     class MRPListing {
-        const DEBUG_PARAMETER = "__mrpdebug";
+        const DEBUG_PARAMETER = "__mrpdebug"; // use ?__mrpdebug=true
         const SHORTCODE_NAME  = "mrp";
         const CONFIG_LOCATION = "/wps/other/wpidx-config.json";
 
@@ -410,8 +415,8 @@ if (!class_exists('MRPListing')) {
                     "head"  => $client->getInlineContent("head"),
                     "description"  => $client->getInlineContent("description")
                 );
-                $this->debug("Response Headers: " . print_r($client->getHeaders(), true));
-                //$client->outputCookieHeaders();
+                //$this->debug("Response Headers: " . print_r($client->getHeaders(), true));
+                $client->outputRegularHeaders();
             }
         }
 
@@ -485,7 +490,7 @@ if (!class_exists('MRPListing')) {
             
             // strip off the extension part, and grab our page name from the slug
             list($pagename, $extension) = $this->processManagedUrl($uri);
-            //error_log( "handleRequest: " . $pagename . ":" . $extension );
+            error_log( "handleRequest: " . $pagename . ":" . $extension );
             
             $searchname = $pagename;
             
@@ -545,9 +550,15 @@ if (!class_exists('MRPListing')) {
                 // modify the regex to break out the slug and extension (if present)
                 $regex = "/^(?P<slug>.+?)(?P<extension>$regex)/i";
                 if (preg_match($regex, $url, $matches)) {
+                	$ext = $matches["extension"];
+                	if( strpos( $ext, "/l/" ) == 0 ) {
+	                	$ext = str_replace( "/l/", "/", $ext );
+                	}
+                	error_log( "processed extension: ". $ext );
+
                     return array(
                         $this->stripLeadingSlash($matches["slug"]),
-                        $this->stripLeadingSlash($matches["extension"])
+                        $this->stripLeadingSlash($ext)
                     );
                 }
             }
@@ -788,6 +799,7 @@ if (!class_exists('MRPListing')) {
 			    '\/idx\.search'                  => false,
 			    '\/listing.*'                    => false,
 			    '\/searchresults\.form'          => false,
+			    '\/unibox\.search'               => false,
 			    '\/search\.form'                 => false,
 			    '\/details-[0-9]+'               => false,
 			    '\/photos-[0-9]+'                => false,

@@ -6,7 +6,8 @@ use MRPIDX\HTTP\Client;
 
 class InlineClient {
 
-    const SERVER = 'listings.myrealpage.com';
+	const SERVER = 'listings.myrealpage.com';
+    //const SERVER = 'ec2-beta.myrealpage.com';
     //const SERVER = '96.49.208.17';
     const RES_SERVER = \MRPIDX\InlineClient::SERVER;
 
@@ -101,6 +102,13 @@ class InlineClient {
         $this->client = $client;
         $this->logger->debug("Request headers: " . print_r($client->getHeaders(), true));
         //error_log("Request headers: " . print_r($client->getHeaders(), true));
+        
+        
+        if( $_SERVER['REQUEST_METHOD'] == 'POST' ) {
+        	$client->setMethod(Client::POST);
+        	$client->setParams( file_get_contents("php://input") );
+        } 
+        
         $client->makeRequest();
         $response = $client->getResponse();
         
@@ -133,16 +141,19 @@ class InlineClient {
 
         // handle redirects from MRP side
         if ($response->isRedirect()) {
+                
             if (!$response->hasHeader("Location")) {
                 // redirect with no location header
+                error_log( "no location: " . $response->getHeader('Location') );
+
                 return;
             }
 
             // root the the location to the local site
             $location = $response->getHeader('Location');
-            error_log( "REDIRECT: " . $location );
+            //error_log( "REDIRECT: " . $location );
             $location = preg_replace('@http://(.+?)/(.*)@', ( $this->isSecure() ? 'https://' : 'http://' ) .$_SERVER['HTTP_HOST'].'/$2', $location);
-            error_log( "REDIRECT2: " . $location );
+            //error_log( "REDIRECT2: " . $location );
             $this->client->setResponseHeader("Location", $location);
         }
     }
@@ -226,43 +237,101 @@ class InlineClient {
     
     public function outputHeaders()
     {
+	    //$this->logger->debug("Outputting headers " );
         if (headers_sent()) {
             // headers have already been sent - this is an error
             $this->logger->error("Headers already sent!");
             return;
         }
+        
 
         if (!$this->client) {
             // client hasn't been used
             $this->logger->error("Client not used? (" . __METHOD__ . ")");
+            return;
         }
+        
 
         $response = $this->client->getResponse();
 
         // response code header
-        header("HTTP/1.1 " . $response->getResponseCode());
+        header("HTTP/1.1 " . $response->getResponseCode(), true );
 
         // Set-Cookie: headers if present
-        if ($response->hasHeaders() /* && $response->hasHeader("Set-Cookie") */ ) {
+        if ($response->hasHeaders() ) {
             foreach ($response->getHeaders() as $name => $value) {
             	if( $name != "Set-Cookie" ) {
             		// we process cookies separately, due to there being multiple headers
-	            	header($name . ": " . $value);
+					//$this->logger->debug($name . ": " . $value);
+					header($name . ": " . $value);
             	}
             }
         }
         
-        $cookies = $response->getCookies();
+        $this->outputCookieHeaders();
+                
+        // Location: header if required (if this is a redirect)
+        if ($response->isRedirect() && $response->hasHeader("Location")) {
+            header("Location: " . $response->getHeader("Location"), true);
+        }
+    }
+    
+    public function outputRegularHeaders()
+    {
+    	//$this->logger->debug("Outputting headers " );
+        if (headers_sent()) {
+            // headers have already been sent - this is an error
+            $this->logger->error("Headers already sent!");
+            return;
+        }
+        
+
+        if (!$this->client) {
+            // client hasn't been used
+            $this->logger->error("Client not used? (" . __METHOD__ . ")");
+            return;
+        }
+        
+
+        $response = $this->client->getResponse();
+
+        // response code header
+        header("HTTP/1.1 " . $response->getResponseCode(), true );
+
+        // Set-Cookie: headers if present
+        if ($response->hasHeaders() ) {
+            foreach ($response->getHeaders() as $name => $value) {
+	            //$this->logger->debug(" >>" . $name . ": " . $value);
+            	if( $name != "Set-Cookie" && ( $name == "Cache-Control" || $name == "Expires" ) ) {
+            		// we process cookies separately, due to there being multiple headers
+					$this->logger->debug("Setting header: " . $name . ": " . $value);
+					header($name . ": " . $value, true);
+            	}
+            }
+        }
+
+        
+        $this->outputCookieHeaders();
+                
+        // Location: header if required (if this is a redirect)
+        if ($response->isRedirect() && $response->hasHeader("Location")) {
+            header("Location: " . $response->getHeader("Location"), true);
+        }
+    }
+    
+    public function outputCookieHeaders()
+	{
+    
+    	$response = $this->client->getResponse();
+        		
+	    $cookies = $response->getCookies();
+        //$this->logger->debug("Setting cookies: " . print_r($cookies,true) );
         foreach( $cookies as $cookie ) {
 	        //error_log( "COOKIE: " . $cookie );
+	        $this->logger->debug("Setting cookie: " . $cookie );
 	        header( "Set-Cookie :" . $cookie, false );
         }
         //error_log( "COOKIES: " . print_r( $response->getCookies(), true ));
-
-        // Location: header if required (if this is a redirect)
-        if ($response->isRedirect() && $response->hasHeader("Location")) {
-            header("Location: " . $response->getHeader("Location"));
-        }
     }
 
     public function getHeaders()

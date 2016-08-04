@@ -61,6 +61,7 @@ class Client
             foreach ($this->getHeaders() as $name => $value) {
                 $headers[] = "$value";
             }
+            $headers[] = "Expect:"; // need this to prevent 100-continue headers interfering
             curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         }
 
