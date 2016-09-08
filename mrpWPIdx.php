@@ -369,8 +369,9 @@ if (!class_exists('MRPListing')) {
             // check whether we have an MRP shortcode, and process it
             if ( isset($post) && has_shortcode($post->post_content, 'mrp')) {
 
-                // parse out shortcode attributes and create a context object
-                $attrs = shortcode_parse_atts($post->post_content);
+                // extract just the 'mrp' shortcode, parse attributes and create a context object
+                preg_match('/' . get_shortcode_regex(array('mrp')) . '/', $post->post_content, $matches);
+                $attrs = shortcode_parse_atts($matches[0]);
 				
                 unset($attrs[0]);
                 unset($attrs[1]);
