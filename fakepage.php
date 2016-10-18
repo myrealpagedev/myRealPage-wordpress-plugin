@@ -147,7 +147,7 @@ class FakePage
 	function getContent()
 	{
         if (trim($this->page_content) == '')                    
-		    return '<p>Hi there!  You are viewing my fake post!</p>';
+		    return '<p>========================</p>';
         else                                            
             return $this->page_content;
 	}

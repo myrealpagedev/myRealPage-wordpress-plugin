@@ -329,7 +329,7 @@ class InlineClient {
         foreach( $cookies as $cookie ) {
 	        //error_log( "COOKIE: " . $cookie );
 	        $this->logger->debug("Setting cookie: " . $cookie );
-	        header( "Set-Cookie :" . $cookie, false );
+	        header( "Set-Cookie:" . $cookie, false );
         }
         //error_log( "COOKIES: " . print_r( $response->getCookies(), true ));
     }

@@ -3,7 +3,7 @@
 /**
  * Plugin Name: myRealPage IDX Listings
  * Description: Embeds myRealPage IDX and Listings solution into WordPress. Uses shortcodes. Create a post or page and use integrated shortcode button to launch myRealPage Listings Shortcode Wizard and generate a shortcode based on your choice of listing content, as well as functional and visual preferences.
- * Version: 0.9.9
+ * Version: 0.9.11
  * Author: myRealPage (support@myrealpage.com)
  * Author URI: http://myrealpage.com
  **/
@@ -483,7 +483,12 @@ if (!class_exists('MRPListing')) {
             
             $this->logger->debug( "This is managed URL: ". $uri . "|" . $this->isManagedUrl($uri) );
             //error_log( "This is managed URL: ". $uri . "|" . $this->isManagedUrl($uri) );
-
+            
+            // redirect URLs with "/l/" from the old plugin
+			if( strstr( $uri, "/l/" ) ) { 
+				header('Location: ' . str_replace( "/l/", "/", $uri ) );
+				die();
+			}
 
             // nothing to do if this isn't a managed URL
             if (!$this->isManagedUrl($uri) || strstr($uri, "/gmform15/")) {
@@ -505,10 +510,15 @@ if (!class_exists('MRPListing')) {
             // find the page, based on page name
             $query  = $wpdb->prepare("SELECT * FROM {$wpdb->posts} WHERE post_name=%s", $searchname);
             $result = $wpdb->get_results($query, OBJECT_K);
+            
+            $this->logger->debug( "searchname: " . $searchname );
+
             if (count($result)) {
+         
+
                 // generate content for this page using the "parent" page
                 require_once("fakepage.php");
-                $result     = end($result);
+                $result     = reset($result); // first element in array
                 $requestUri = $_SERVER["REQUEST_URI"];
                 $slug       = substr($requestUri, 1);
                                 
