@@ -3,7 +3,7 @@
 /**
  * Plugin Name: myRealPage IDX Listings
  * Description: Embeds myRealPage IDX and Listings solution into WordPress. Uses shortcodes. Create a post or page and use integrated shortcode button to launch myRealPage Listings Shortcode Wizard and generate a shortcode based on your choice of listing content, as well as functional and visual preferences.
- * Version: 0.9.11
+ * Version: 0.9.12
  * Author: myRealPage (support@myrealpage.com)
  * Author URI: http://myrealpage.com
  **/
@@ -485,7 +485,7 @@ if (!class_exists('MRPListing')) {
             //error_log( "This is managed URL: ". $uri . "|" . $this->isManagedUrl($uri) );
             
             // redirect URLs with "/l/" from the old plugin
-			if( strstr( $uri, "/l/" ) ) { 
+			if( strstr( $uri, "/l/" ) && !strstr( $uri, "/wps/" ) ) { 
 				header('Location: ' . str_replace( "/l/", "/", $uri ) );
 				die();
 			}
