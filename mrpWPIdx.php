@@ -154,14 +154,13 @@ if (!class_exists('MRPListing')) {
             // register with shortcode API to do content replacement.
             add_shortcode(self::SHORTCODE_NAME, array(&$this, 'replaceContent'));
             
-                        // init method to trap /wps/evow/ requests
+            // init method to trap /wps/evow/ requests
             add_action('init', array(&$this, 'evowAndRecipHandler'));
             add_action('init', array(&$this, 'handleRequest'));
 
             // method that handles direct proxying
             add_action('parse_request', array(&$this, 'directProxy')); // 1
 
-            
             // generates saved values.
             add_action('wp', array(&$this, 'replacedWP'));
             
@@ -170,7 +169,10 @@ if (!class_exists('MRPListing')) {
 
             // replace title with custom MRP one.
             add_filter('wp_title', array(&$this, 'customTitle'), 1);
-            
+
+            // ensure we set post meta data based on the parent, for synthetic pages
+            add_filter('get_post_metadata', array(&$this, 'getPostMetadata'), 99, 4);
+
             // this needs attention: this can be called for a variety of posts
             // within ANY url to get titles, for generating menus, etc. This 
             // may be detrimental, but if enabled allows proper generation of
@@ -531,7 +533,6 @@ if (!class_exists('MRPListing')) {
                     "post_type"   => $result->post_type
                 );
                 $synthetic = new FakePage($slug, $result->post_title, $result->post_content, $context);
-                
                 $this->synthetic_page = $synthetic;
                 
                 return $synthetic;
@@ -547,6 +548,27 @@ if (!class_exists('MRPListing')) {
                 set_query_var('pagename',  $pagename);
                 set_query_var('name',      $pagename);
             }
+        }
+
+        /*
+         * @param string|array $metadata - Always null for post metadata.
+         * @param int $object_id - Post ID for post metadata
+         * @param string $meta_key - metadata key.
+         * @param bool $single - Indicates if processing only a single $metadata value or array of values.
+         * @return Original or Modified $metadata.
+         */
+        public function getPostMetadata($meta_value, $object_id, $meta_key, $single)
+        {
+            global $post;
+
+            // check for synthetic page, and use parent post's meta data
+            // NOTE: WordPress gives us the absolute value of the post ID in $object_id,
+            //       and we are expecting -1 - use $post->ID as well, as it is more reliable
+            if ($object_id == 1 && $post->ID == -1 && $post->post_parent) {
+                return get_metadata('post', $post->post_parent, $meta_key, $single);
+            }
+
+            return $metadata;
         }
 
         private function processManagedUrl($url)
