@@ -45,15 +45,10 @@ class FakePage
          * We'll wait til WordPress has looked for posts, and then
          * check to see if the requested url matches our target.
          */
-        $this->page_slug = $aSlug;
-        $this->page_title = $aTitle;
+        $this->page_slug    = $aSlug;
+        $this->page_title   = $aTitle;
         $this->page_content = $aContent;
-
-        if (!empty($context)) {
-            foreach ($context as $name => $value) {
-                $this->$name = $value;
-            }
-        }
+        $this->context      = $context;
 
         add_filter('the_posts',array(&$this,'detectPost'));
     }
@@ -112,8 +107,6 @@ class FakePage
          */
         $post->ID = -1;
 
-        $post->post_parent = isset( $this->post_parent ) ? $this->post_parent : null;
-
         /**
          * Static means a page, not a post.
          */
@@ -140,6 +133,13 @@ class FakePage
          */
         $post->post_date = current_time('mysql');
         $post->post_date_gmt = current_time('mysql', 1);
+
+        // set any context fields
+        if (!empty($this->context)) {
+            foreach ($this->context as $key => $value) {
+                $post->$key = $value;
+            }
+        }
 
         return($post);
     }
