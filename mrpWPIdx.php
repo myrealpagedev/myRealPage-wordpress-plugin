@@ -3,7 +3,7 @@
 /**
  * Plugin Name: myRealPage IDX Listings
  * Description: Embeds myRealPage IDX and Listings solution into WordPress. Uses shortcodes. Create a post or page and use integrated shortcode button to launch myRealPage Listings Shortcode Wizard and generate a shortcode based on your choice of listing content, as well as functional and visual preferences.
- * Version: 0.9.12
+ * Version: 0.9.13
  * Author: myRealPage (support@myrealpage.com)
  * Author URI: http://myrealpage.com
  **/
@@ -367,10 +367,12 @@ if (!class_exists('MRPListing')) {
             //error_log( "replacedWP" . print_r( $post, true ) );
 
             // check whether we have an MRP shortcode, and process it
+            $this->debug( "Has shortcode: " . ( has_shortcode($post->post_content, 'mrp') ? "Yes" : "No" ) );
             if ( isset($post) && has_shortcode($post->post_content, 'mrp')) {
 
                 // extract just the 'mrp' shortcode, parse attributes and create a context object
-                preg_match('/' . get_shortcode_regex(array('mrp')) . '/', $post->post_content, $matches);
+                $hit = preg_match('/' . get_shortcode_regex(array('mrp')) . '/', $post->post_content, $matches);
+                $this->debug("Shortcode found: " . ($hit ? "yes" : "no" ));
                 $attrs = shortcode_parse_atts($matches[0]);
 				
                 unset($attrs[0]);
@@ -416,6 +418,7 @@ if (!class_exists('MRPListing')) {
                     "head"  => $client->getInlineContent("head"),
                     "description"  => $client->getInlineContent("description")
                 );
+                $this->debug("Parsed Content: " . print_r($this->mrpData, true));
                 //$this->debug("Response Headers: " . print_r($client->getHeaders(), true));
                 $client->outputRegularHeaders();
             }
@@ -485,7 +488,7 @@ if (!class_exists('MRPListing')) {
             //error_log( "This is managed URL: ". $uri . "|" . $this->isManagedUrl($uri) );
             
             // redirect URLs with "/l/" from the old plugin
-			if( strstr( $uri, "/l/" ) && !strstr( $uri, "/wps/" ) ) { 
+			if( strstr( $uri, "/l/" ) && !strstr( $uri, "/wps/" ) && !strstr( strtolower($uri), "/unibox.search" ) ) { 
 				header('Location: ' . str_replace( "/l/", "/", $uri ) );
 				die();
 			}
@@ -590,6 +593,7 @@ if (!class_exists('MRPListing')) {
             $regexes = $this->config && isset($this->config["managed_urls"]) ? $this->config["managed_urls"] : array();
             foreach ($regexes as $regex => $cached) {
                 if ($regex && preg_match("/$regex/i", $url)) {
+                	$this->debug( "Matched managed URL expression: ". $regex );
                     return true;
                 }
             }
@@ -809,7 +813,7 @@ if (!class_exists('MRPListing')) {
 			    '\/[0-9]+\.vowsearch.*'          => false,
 			    '\/vowcategory\.form.*'          => false,
 			    '\/idx\.search'                  => false,
-			    '\/listing.*'                    => false,
+			    '\/listing\..*'                    => false,
 			    '\/searchresults\.form'          => false,
 			    '\/unibox\.search'               => false,
 			    '\/search\.form'                 => false,
