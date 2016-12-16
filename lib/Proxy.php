@@ -77,9 +77,12 @@ $content = str_replace(
 */
 
         // touch up the content length header, since the above search and replace may have broken it
+        /* skip content-length altogether to prevent nginx "chunked" transfer encoding conflict
+        
         if ($response->getInfo('download_content_length')) {
             header('Content-Length: ' . strlen($content));
         }
+        */
 
         // output Set-Cookie: or caching headers, headers if any
         if ($response->hasHeaders()) {
