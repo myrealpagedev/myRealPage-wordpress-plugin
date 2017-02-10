@@ -174,7 +174,7 @@ class FakePage
              */
             $wp_query->is_page = true;
             // Not sure if this one is necessary but might as well set it like a true page
-            $wp_query->is_singular = false;
+            $wp_query->is_singular = true;
             $wp_query->is_single = false;
             $wp_query->is_home = false;
             $wp_query->is_archive = false;
