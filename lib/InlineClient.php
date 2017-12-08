@@ -117,7 +117,14 @@ class InlineClient {
 
         // set raw content in case we need it later
         $this->setInlineContent("raw", $response->getRawContent());
-
+        
+                
+        $listingContentType = "";
+        if( $response->hasHeader( "X-MRP-LISTING-CONTENT" ) && $response->getHeader( "X-MRP-LISTING-CONTENT" ) ) {
+	        $listingContentType = $response->getHeader( "X-MRP-LISTING-CONTENT" );
+        }
+        $this->setInlineContent("listing_content_type", trim($listingContentType) );
+        
         $status  = $response->getResponseCode();
         $content = $response->getContent();
         $body = '';

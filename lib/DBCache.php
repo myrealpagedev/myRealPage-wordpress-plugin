@@ -89,7 +89,7 @@ class DBCache
 			return false;
 		}
 		
-		if( issset( $_SERVER['HTTP_REFERER'] ) && stripos( $_SERVER['HTTP_REFERER'], 'nowebcache=' ) ) {
+		if( isset( $_SERVER['HTTP_REFERER'] ) && stripos( $_SERVER['HTTP_REFERER'], 'nowebcache=' ) ) {
 			//error_log( "Cache skip based on NOWEBCACHE referer parameter: " . $uri );
 			return false;
 		}

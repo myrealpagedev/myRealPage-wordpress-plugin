@@ -3,7 +3,7 @@
 /**
  * Plugin Name: myRealPage IDX Listings
  * Description: Embeds myRealPage IDX and Listings solution into WordPress. Uses shortcodes. Create a post or page and use integrated shortcode button to launch myRealPage Listings Shortcode Wizard and generate a shortcode based on your choice of listing content, as well as functional and visual preferences.
- * Version: 0.9.17
+ * Version: 0.9.20
  * Author: myRealPage (support@myrealpage.com)
  * Author URI: http://myrealpage.com
  **/
@@ -151,6 +151,7 @@ if (!class_exists('MRPListing')) {
             // add rewrite rules in so we can handle URI segments past the end of a permalink
             add_filter('generate_rewrite_rules', array(&$this, 'addRewrites'));
             add_filter('query_vars', array(&$this, 'addQueryVars'));
+            add_filter( 'body_class',array(&$this, 'bodyClass') );
             // register with shortcode API to do content replacement.
             add_shortcode(self::SHORTCODE_NAME, array(&$this, 'replaceContent'));
             
@@ -169,6 +170,7 @@ if (!class_exists('MRPListing')) {
 
             // replace title with custom MRP one.
             add_filter('wp_title', array(&$this, 'customTitle'), 1);
+            add_filter('pre_get_document_title', array(&$this, 'customTitle'), 1);
 
             // ensure we set post meta data based on the parent, for synthetic pages
             add_filter('get_post_metadata', array(&$this, 'getPostMetadata'), 99, 4);
@@ -195,6 +197,14 @@ if (!class_exists('MRPListing')) {
             // any tasks that ought to be run in the background (hourly)
             add_action("mrpidx_hourly_event_hook", array(&$this, "performHourlyTasks"));
             
+        }
+        
+        public function bodyClass( $classes ) {
+        	if( isset( $this->mrpData["listing_content_type"] ) && $this->mrpData["listing_content_type"] != "" ) {
+	        	$classes[] = ( "mrp-listings-" . $this->mrpData["listing_content_type"] );
+        	}
+	        
+	        return $classes;
         }
 
         public function addMenu()
@@ -418,8 +428,10 @@ if (!class_exists('MRPListing')) {
                     "title" => $client->getInlineContent("title"),
                     "body"  => $client->getInlineContent("body"),
                     "head"  => $client->getInlineContent("head"),
-                    "description"  => $client->getInlineContent("description")
+                    "description"  => $client->getInlineContent("description"),
+                    "listing_content_type" => $client->getInlineContent("listing_content_type")
                 );
+
                 $this->debug("Parsed Content: " . print_r($this->mrpData, true));
                 //$this->debug("Response Headers: " . print_r($client->getHeaders(), true));
                 $client->outputRegularHeaders();
