@@ -12,7 +12,7 @@ function mrp_sc_optimalHeight()
 
 function mrp_openSC()
 {
-   var win = window.open( "http://listings.myrealpage.com/wps/rest/auth/sc", "mrp_shorcodes_wizard", "scrollbars=1,width=800,height=" + mrp_sc_optimalHeight() );
+   var win = window.open( "https://private-office.myrealpage.com/wps/rest/auth/sc", "mrp_shorcodes_wizard", "scrollbars=1,width=800,height=" + mrp_sc_optimalHeight() );
    if( !win ) {
       alert( "It appears, you have blocked popups. Please allow popups for this page in order to open the Shortcode Wizard." );
    }

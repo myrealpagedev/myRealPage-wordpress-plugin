@@ -3,7 +3,7 @@ Contributors: myRealPage
 Tags: mrp, idx, myRealPage, listings, real estate, crea, ddf, reciprocity, vow, realtor, treb, 
 Requires at least: 4.0
 Tested up to: 4.6.1
-Stable tag: 0.9.20
+Stable tag: 0.9.21
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -50,6 +50,9 @@ You may have accidentally deactivated your myRealPage IDX Listings plugin. Pleas
 
 
 == Changelog ==
+= 0.9.21 =
+*  Modified the URL of the shortcode editor to go to the Private Office. 
+
 = 0.9.20 =
 *  Added new classes for better styling support
 

@@ -21,7 +21,7 @@ class InlineClient {
     {
         $this->context = !is_null($context) ? $context : new Context();
         $this->logger  = $logger;
-
+        
         // add default headers
         $this->headers += array(
             "MrpStripPowered: false",
@@ -448,8 +448,19 @@ class InlineClient {
     private function getCookieHeader()
     {
         $cookie = "";
+        
+        if ( function_exists('getallheaders') && getallheaders() ) {
+	        $this->logger->debug( 'RAW COOKIE HEADER: ' . getallheaders()['Cookie'] );
+        }
+        elseif( !function_exists('getallheaders') ) {
+        	$this->logger->debug( 'RAW COOKIE HEADER: ' . $_SERVER['HTTP_Cookie'] );
+        }
+        
+        $this->logger->debug( '$_COOKIE: ' . $_COOKIE . " COUNT: " . count($_COOKIE) );
+
         if (count($_COOKIE)) {
             foreach ($_COOKIE as $name => $value) {
+            	$this->logger->debug( "COOKIE NAME: " . $name . " VALUE: " . $value );
                 if (is_array($value)) {
                     continue;
                 }
