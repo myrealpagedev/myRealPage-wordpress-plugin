@@ -1,0 +1,8 @@
+{
+ 	"name" : "myRealPage IDX Listings",
+ 	"version" : "0.9.21",
+ 	"download_url" : "https://github.com/myrealpagedev/myRealPage-wordpress-plugin/archive/master.zip",
+ 	"sections" : {
+ 		"description" : "Embeds myRealPage Listings into WordPress. Create a post or page and use shortcode button to launch Shortcode Wizard and generate a shortcode."
+ 	}
+ }

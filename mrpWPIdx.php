@@ -917,7 +917,3 @@ if (!class_exists('MRPListing')) {
 
     $mrp = new MRPListing();
 }
-require_once( 'BFIGitHubPluginUploader.php' );
-if ( is_admin() ) {
-    new BFIGitHubPluginUpdater( __FILE__, 'myrealpagedev', "myRealPage-wordpress-plugin" );
-}
