@@ -200,11 +200,11 @@ if (!class_exists('MRPListing')) {
         }
 
         public function bodyClass( $classes ) {
-        	if( isset( $this->mrpData["listing_content_type"] ) && $this->mrpData["listing_content_type"] != "" ) {
-	        	$classes[] = ( "mrp-listings-" . $this->mrpData["listing_content_type"] );
-        	}
+            if( isset( $this->mrpData["listing_content_type"] ) && $this->mrpData["listing_content_type"] != "" ) {
+                $classes[] = ( "mrp-listings-" . $this->mrpData["listing_content_type"] );
+            }
 
-	        return $classes;
+            return $classes;
         }
 
         public function addMenu()
@@ -306,30 +306,30 @@ if (!class_exists('MRPListing')) {
 
         public function customTheTitle($title, $id = null)
         {
-        	if( $id == -1 ) { // we have our synthetic page
+            if( $id == -1 ) { // we have our synthetic page
 
-        		// special case for /evow/, we also make sure that we are not in listing details, in which case other rules apply (i.e. customTitle() check)
-        		if( preg_match( '/.*\/evow\/.*/i', $_SERVER['REQUEST_URI'] ) && $this->customTitle($title) == $title ) {
-	        		return 'Found Listings';
-        		}
+                // special case for /evow/, we also make sure that we are not in listing details, in which case other rules apply (i.e. customTitle() check)
+                if( preg_match( '/.*\/evow\/.*/i', $_SERVER['REQUEST_URI'] ) && $this->customTitle($title) == $title ) {
+                    return 'Found Listings';
+                }
 
-        		// special case for navigation:
-				if( preg_match( '/.*\/searchresults\.form.*/i', $_SERVER['REQUEST_URI']) ) {
-	    			if( $_GET['_pg'] != '' ) {
-	        			return $title . ' [p.' . $_GET['_pg'] . ']';
-	    			}
-	    			else {
-	    				return $title . ' [results]';
-	    			}
-				}
+                // special case for navigation:
+                if( preg_match( '/.*\/searchresults\.form.*/i', $_SERVER['REQUEST_URI']) ) {
+                    if( $_GET['_pg'] != '' ) {
+                        return $title . ' [p.' . $_GET['_pg'] . ']';
+                    }
+                    else {
+                        return $title . ' [results]';
+                    }
+                }
 
-				// make sure we are responsible for the title as well
-				$regex = isset($this->config["replaceable_titles"]) ? $this->config["replaceable_titles"] : "";
-				if( $regex != "" && preg_match($regex, $_SERVER['REQUEST_URI']) && isset($this->mrpData["title"]) ) {
-	        		return $this->mrpData["title"];
-        		}
-	        	//error_log( "SYNTHETIC TITLE!!!: " . $this->mrpData["title"] );
-        	}
+                // make sure we are responsible for the title as well
+                $regex = isset($this->config["replaceable_titles"]) ? $this->config["replaceable_titles"] : "";
+                if( $regex != "" && preg_match($regex, $_SERVER['REQUEST_URI']) && isset($this->mrpData["title"]) ) {
+                    return $this->mrpData["title"];
+                }
+                //error_log( "SYNTHETIC TITLE!!!: " . $this->mrpData["title"] );
+            }
             return $title;
         }
 
@@ -404,13 +404,13 @@ if (!class_exists('MRPListing')) {
                         "googleMapApiKey" => $this->getOption(self::GOOGLE_MAP_API_KEY)
                     );
 
-				//error_log( "$attrs: ". print_r( $attrs, true ) );
+                //error_log( "$attrs: ". print_r( $attrs, true ) );
                 $context = new \MRPIDX\Context($attrs);
 
                 //error_log( "ATTS: " . print_r( $attrs, true ) );
                 if( isset($attrs["searchform_def"]) && $attrs["searchform_def"] != "" ) {
-	                // no remote call on search form IDX
-	              	return;
+                    // no remote call on search form IDX
+                    return;
                 }
 
 
@@ -460,10 +460,10 @@ if (!class_exists('MRPListing')) {
                 //return $client->getEmbeddedFormJS();
 
                 $script1= "\n<script src='//" . \MRPIDX\InlineClient::RES_SERVER .
-                	"/wps/rest/" . $attrs["account_id"] . "/l/recip/tmpl2.js'></script>\n";
+                    "/wps/rest/" . $attrs["account_id"] . "/l/recip/tmpl2.js'></script>\n";
                 $script2 = "<script src='//" . \MRPIDX\InlineClient::RES_SERVER .
-                	"/wps/js/ng/v2/listings/listings-wp-button.js' id='idx-button-script' data-account='" .
-                		$attrs["account_id"] . "' data-init-attr='" . ($attrs["init_attr"] ? $attrs["init_attr"] : "" ) . "'></script>\n";
+                    "/wps/js/ng/v2/listings/listings-wp-button.js' id='idx-button-script' data-account='" .
+                        $attrs["account_id"] . "' data-init-attr='" . ($attrs["init_attr"] ? $attrs["init_attr"] : "" ) . "'></script>\n";
 
                 return $script1 . $script2;
 
@@ -502,10 +502,10 @@ if (!class_exists('MRPListing')) {
             //error_log( "This is managed URL: ". $uri . "|" . $this->isManagedUrl($uri) );
 
             // redirect URLs with "/l/" from the old plugin
-			if( strstr( $uri, "/l/" ) && !strstr( $uri, "/wps/" ) && !strstr( strtolower($uri), "/unibox.search" ) ) {
-				header('Location: ' . str_replace( "/l/", "/", $uri ) );
-				die();
-			}
+            if( strstr( $uri, "/l/" ) && !strstr( $uri, "/wps/" ) && !strstr( strtolower($uri), "/unibox.search" ) ) {
+                header('Location: ' . str_replace( "/l/", "/", $uri ) );
+                die();
+            }
 
             // nothing to do if this isn't a managed URL
             if (!$this->isManagedUrl($uri) || strstr($uri, "/gmform15/")) {
@@ -520,8 +520,8 @@ if (!class_exists('MRPListing')) {
 
             // in case we get a subpage, i.e. something/somewhere as $pagename, use the last segment
             if( strripos( "$pagename", '/' ) ) {
-	            $searchname = substr( $pagename, strripos( "$pagename", '/' ) + 1 );
-	            //error_log( "SEARCHNAME: ". $searchname );
+                $searchname = substr( $pagename, strripos( "$pagename", '/' ) + 1 );
+                //error_log( "SEARCHNAME: ". $searchname );
             }
 
             // find the page, based on page name
@@ -588,7 +588,7 @@ if (!class_exists('MRPListing')) {
 
         private function processManagedUrl($url)
         {
-        	if (stripos($url, '?')) {
+            if (stripos($url, '?')) {
                 $url = substr($url, 0, stripos($url, '?'));
             }
 
@@ -599,11 +599,11 @@ if (!class_exists('MRPListing')) {
                 // modify the regex to break out the slug and extension (if present)
                 $regex = "/^(?P<slug>.+?)(?P<extension>$regex)/i";
                 if (preg_match($regex, $url, $matches)) {
-                	$ext = $matches["extension"];
-                	if( strpos( $ext, "/l/" ) == 0 ) {
-	                	$ext = str_replace( "/l/", "/", $ext );
-                	}
-                	error_log( "processed extension: ". $ext );
+                    $ext = $matches["extension"];
+                    if( strpos( $ext, "/l/" ) == 0 ) {
+                        $ext = str_replace( "/l/", "/", $ext );
+                    }
+                    error_log( "processed extension: ". $ext );
 
                     return array(
                         $this->stripLeadingSlash($matches["slug"]),
@@ -627,7 +627,7 @@ if (!class_exists('MRPListing')) {
             $regexes = $this->config && isset($this->config["managed_urls"]) ? $this->config["managed_urls"] : array();
             foreach ($regexes as $regex => $cached) {
                 if ($regex && preg_match("/$regex/i", $url)) {
-                	$this->debug( "Matched managed URL expression: ". $regex );
+                    $this->debug( "Matched managed URL expression: ". $regex );
                     return true;
                 }
             }
@@ -653,7 +653,7 @@ if (!class_exists('MRPListing')) {
             if ( $_SERVER['REQUEST_METHOD'] == 'GET' && preg_match('@^/wps/recip/\d+/(.+.search|search.form)@i', $requestUri)) {
                 preg_match('@^/wps/recip/(.*)@', $requestUri, $matches);
                 if (isset($matches[1])) {
-                	//header("HTTP/1.1 301 Moved Permanently");
+                    //header("HTTP/1.1 301 Moved Permanently");
                     header('Location: /recip-' . $matches[1]);
                     die();
                 }
@@ -661,7 +661,7 @@ if (!class_exists('MRPListing')) {
 
             // empty '/recip-xxx' or /recip-xxx/ -> redirect to /recip-xxx/idx.search
             if( preg_match( '@^/recip\-(\d+)[/]{0,1}$@', $requestUri, $matches ) ) {
-	                header('Location: /recip-' . $matches[1] . "/idx.search" );
+                    header('Location: /recip-' . $matches[1] . "/idx.search" );
                     die();
             }
 
@@ -702,7 +702,7 @@ if (!class_exists('MRPListing')) {
             $requestUri = $_SERVER['REQUEST_URI'];
 
             if( preg_match( '/^\/wps\/evow\//', $requestUri ) ) {
-	            return;
+                return;
             }
 
             // no proxying to do, so we're done
@@ -711,7 +711,7 @@ if (!class_exists('MRPListing')) {
             }
 
 
-			$context = new \MRPIDX\Context(
+            $context = new \MRPIDX\Context(
                 array(
                     "debug"           => $this->options[self::DEBUG_OPT_NAME],
                     "pageName"        => $this->getPageName()
@@ -719,14 +719,14 @@ if (!class_exists('MRPListing')) {
             );
             $client = new MRPIDX\InlineClient($this->logger, $context);
 
-			preg_match('@^/recip-(\d+)/.*@', $requestUri, $matches);
-	        if (isset($matches[1])) {
-	        	$requestUri = "/wps/-/noframe~1,tmpl~v2/recip/" . $matches[1] . "/idx.search";
-	        	$inqueryString = $_SERVER['QUERY_STRING'];
-				if( $inqueryString ) {
-					$requestUri .= "?" . $inqueryString;
-				}
-	        	//error_log( "IDX_SEARCH URL: " . $requestUri );
+            preg_match('@^/recip-(\d+)/.*@', $requestUri, $matches);
+            if (isset($matches[1])) {
+                $requestUri = "/wps/-/noframe~1,tmpl~v2/recip/" . $matches[1] . "/idx.search";
+                $inqueryString = $_SERVER['QUERY_STRING'];
+                if( $inqueryString ) {
+                    $requestUri .= "?" . $inqueryString;
+                }
+                //error_log( "IDX_SEARCH URL: " . $requestUri );
             }
 
             //error_log("Direct Proxying: " . $requestUri);
@@ -803,14 +803,14 @@ if (!class_exists('MRPListing')) {
         {
             global $post;
 
-			$url = $_SERVER["REQUEST_URI"];
+            $url = $_SERVER["REQUEST_URI"];
 
             // extract the page name based on either the post permalink, or if this is an MRP-managed
             // URL, remove the extension first
             $pageName = "";
 
             if( isset( $post ) ) {
-            	$pageName = substr(str_replace($this->blogURI, '', get_permalink($post->ID)), 1);
+                $pageName = substr(str_replace($this->blogURI, '', get_permalink($post->ID)), 1);
             }
 
             if ($this->isManagedUrl($url)) {
@@ -839,32 +839,32 @@ if (!class_exists('MRPListing')) {
             $config = array();
             $config["version"] = "0.0";
             $config["managed_urls"] = array(
-			    '\/externalview\.form'           => false,
-			    '\/evow\/.*'                     => false,
-			    '\/browse\/.*'                   => false,
-			    '^\/wps\/'                       => false,
-			    '\/[0-9]+\.search.*'             => false,
-			    '\/[0-9]+\.vowsearch.*'          => false,
-			    '\/vowcategory\.form.*'          => false,
-			    '\/idx\.search'                  => false,
-			    '\/listing\..*'                    => false,
-			    '\/searchresults\.form'          => false,
-			    '\/unibox\.search'               => false,
-			    '\/search\.form'                 => false,
-			    '\/details-[0-9]+'               => false,
-			    '\/photos-[0-9]+'                => false,
-			    '\/videos-[0-9]+'                => false,
-			    '\/floor-plans-[0-9]+'           => false,
-			    '\/map-[0-9]+'                   => false,
-			    '\/print-[0-9]+'                 => false,
-			    '\/listingdetails\.form'         => false,
-			    '\/listingphotos\.form'          => false,
-			    '\/listingvideos\.form'          => false,
-			    '\/listingfloorplans\.form'      => false,
-			    '\/listinggooglemap\.form'       => false,
-			    '\/listingwalkscore\.form'       => false,
-			    '\/gmform15\/(js|dist|font)\/.*' => true
-			);
+                '\/externalview\.form'           => false,
+                '\/evow\/.*'                     => false,
+                '\/browse\/.*'                   => false,
+                '^\/wps\/'                       => false,
+                '\/[0-9]+\.search.*'             => false,
+                '\/[0-9]+\.vowsearch.*'          => false,
+                '\/vowcategory\.form.*'          => false,
+                '\/idx\.search'                  => false,
+                '\/listing\..*'                    => false,
+                '\/searchresults\.form'          => false,
+                '\/unibox\.search'               => false,
+                '\/search\.form'                 => false,
+                '\/details-[0-9]+'               => false,
+                '\/photos-[0-9]+'                => false,
+                '\/videos-[0-9]+'                => false,
+                '\/floor-plans-[0-9]+'           => false,
+                '\/map-[0-9]+'                   => false,
+                '\/print-[0-9]+'                 => false,
+                '\/listingdetails\.form'         => false,
+                '\/listingphotos\.form'          => false,
+                '\/listingvideos\.form'          => false,
+                '\/listingfloorplans\.form'      => false,
+                '\/listinggooglemap\.form'       => false,
+                '\/listingwalkscore\.form'       => false,
+                '\/gmform15\/(js|dist|font)\/.*' => true
+            );
             // regex for URL patterns where we do title replacement
             $config["replaceable_titles"] = '@.*/(listing\..+|details\-|photos\-|videos\-|map\-|walkscore\-|'
                 . 'print\-|ListingPrint\.form|ListingWalkScore\.form|'
@@ -882,7 +882,7 @@ if (!class_exists('MRPListing')) {
          */
         public function updateConfig()
         {
-        	// fetch the file
+            // fetch the file
             $client = new \MRPIDX\HTTP\Client( "http://" . MRPIDX\InlineClient::SERVER . self::CONFIG_LOCATION);
             $client->makeRequest();
             $response = $client->getResponse();
@@ -907,7 +907,7 @@ if (!class_exists('MRPListing')) {
                     $this->logger->debug("Updating config from " . $current . " to " . $config["version"]);
                 }
                 else {
-	                //error_log( "Config update skipped: version same or lower: " . $config["version"] );
+                    //error_log( "Config update skipped: version same or lower: " . $config["version"] );
                 }
             } else {
                 $this->logger->warn("Could not update configuration from: " . self::CONFIG_LOCATION);
@@ -917,3 +917,9 @@ if (!class_exists('MRPListing')) {
 
     $mrp = new MRPListing();
 }
+require 'plugin-update-checker.php';
+$myUpdateChecker = Puc_v4_Factory::buildUpdateChecker(
+    'https://github.com/myrealpagedev/myRealPage-wordpress-plugin/blob/master/details.json',
+    __FILE__, //Full path to the main plugin file or functions.php.
+    'myRealPage-wordpress-plugin'
+);
