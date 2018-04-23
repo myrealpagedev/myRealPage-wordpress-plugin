@@ -1,8 +1,30 @@
 {
- 	"name" : "myRealPage IDX Listings",
- 	"version" : "0.9.21",
- 	"download_url" : "https://github.com/myrealpagedev/myRealPage-wordpress-plugin/archive/master.zip",
- 	"sections" : {
- 		"description" : "Embeds myRealPage Listings into WordPress. Create a post or page and use shortcode button to launch Shortcode Wizard and generate a shortcode."
- 	}
- }
+	"name": "myRealPage IDX Listings",
+	"vezsion": "0.9.21",
+	 "download_url" : "https://github.com/myrealpagedev/myRealPage-wordpress-plugin/archive/master.zip",
+
+	"homepage": "https://myrealpage.com/",
+	"requires": "4.5",
+	"tested": "4.8",
+	"last_updated": "2017-01-01 16:17:00",
+	"upgrade_notice": "Here's why you should upgrade...",
+
+	"author": "myRealPage",
+	"author_homepage": "https://myrealpage.com/",
+
+	"sections": {
+		"description" : "Embeds myRealPage Listings into WordPress. Create a post or page and use shortcode button to launch Shortcode Wizard and generate a shortcode.",
+	},
+
+	"icons" : {
+		"1x" : "https://github.com/myrealpagedev/myRealPage-wordpress-plugin/blob/master/assets/icon-128x128.png",
+		"2x" : "https://github.com/myrealpagedev/myRealPage-wordpress-plugin/blob/master/assets/icon-256x256.png"
+    },
+
+	"banners": {
+		"low": "https://github.com/myrealpagedev/myRealPage-wordpress-plugin/blob/master/assets/banner-772x250.jpg?raw=true",
+		"high": "https://github.com/myrealpagedev/myRealPage-wordpress-plugin/blob/master/assets/banner-1544x500.png?raw=true"
+	},
+
+
+}
