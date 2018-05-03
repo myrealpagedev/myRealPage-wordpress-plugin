@@ -1,4 +1,13 @@
 <?php
+/*
+  Plugin Name - Fake Page Plugin 2
+  Plugin URI - http://scott.sherrillmix.com/blog/blogger/creating-a-better-fake-post-with-a-wordpress-plugin/
+  Description - Creates a fake page without a 404 error (based on <a href="http://headzoo.com/tutorials/wordpress-creating-a-fake-post-with-a-plugin">Sean Hickey's Fake Plugin Page</a>)
+  Author - Scott Sherrill-Mix
+  Author URI - http://scott.sherrillmix.com/blog/
+  Version - 1.1
+ */
+
 class FakePage
 {
     /**

@@ -128,7 +128,7 @@ class InlineClient {
         $status  = $response->getResponseCode();
         $content = $response->getContent();
         $body = '';
-        if ($status == 200 || $status == 404) {
+        if ($status == 200 || $status == 404 || $status == 410 ) {
             // If the content type is text/plain we do some magic - we check that it begins
             // with text/plain in case it is followed by an encoding.
             if ($response->hasHeader('Content-Type')
@@ -141,6 +141,9 @@ class InlineClient {
             }
 
             if ($status == 404) {
+                $this->setInlineContent("title", "Not Found");
+            }
+            if ($status == 410) {
                 $this->setInlineContent("title", "Not Found");
             }
             return;
