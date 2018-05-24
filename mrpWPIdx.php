@@ -3,7 +3,7 @@
 /**
  * Plugin Name: myRealPage IDX Listings
  * Description: Embeds myRealPage IDX and Listings solution into WordPress. Uses shortcodes. Create a post or page and use integrated shortcode button to launch myRealPage Listings Shortcode Wizard and generate a shortcode based on your choice of listing content, as well as functional and visual preferences.
- * Version: 0.9.24
+ * Version: 0.9.25
  * Author: myRealPage (support@myrealpage.com)
  * Author URI: http://myrealpage.com
  **/
@@ -530,17 +530,24 @@ if (!class_exists('MRPListing')) {
             }
             
             // find the page, based on page name
-            $query  = $wpdb->prepare("SELECT * FROM {$wpdb->posts} WHERE post_name=%s", $searchname);
-            $result = $wpdb->get_results($query, OBJECT_K);
+            //$query  = $wpdb->prepare("SELECT * FROM {$wpdb->posts} WHERE post_name=%s", $searchname);
+            //$result = $wpdb->get_results($query, OBJECT_K);
             
             $this->logger->debug( "searchname: " . $searchname );
+            $this->logger->debug( "pagename: " . $pagename );
+            //$this->logger->debug( "result: " . print_r( $result, true ) );
+            
+            $page_by_slug = get_page_by_path( $pagename );
+            $this->logger->debug( "page_by_slug: " . print_r( $page_by_slug, true ) );
 
-            if (count($result)) {
-         
+            //if (count($result)) {
+			if( $page_by_slug ) {
+			
+				$result = $page_by_slug;
 
                 // generate content for this page using the "parent" page
                 require_once("fakepage.php");
-                $result     = reset($result); // first element in array
+                //$result     = reset($result); // first element in array
                 $requestUri = $_SERVER["REQUEST_URI"];
                 $slug       = substr($requestUri, 1);
                                 
@@ -552,7 +559,7 @@ if (!class_exists('MRPListing')) {
                     "post_parent" => $result->ID,
                     "post_type"   => $result->post_type
                 );
-                $synthetic = new FakePage($slug, $result->post_title, $result->post_content, $context);
+                $synthetic = new FakePage($slug, $result->post_title, $result->post_content, $context );
                 $this->synthetic_page = $synthetic;
                 
                 return $synthetic;
