@@ -21,7 +21,7 @@ class InlineClient {
     {
         $this->context = !is_null($context) ? $context : new Context();
         $this->logger  = $logger;
-
+        
         // add default headers
         $this->headers += array(
             "MrpStripPowered: false",
@@ -66,6 +66,10 @@ class InlineClient {
 
         if ($context->has("permAttr")) {
             $this->headers[] = "Listing-ViewAttrs: " . $context->get("permAttr");
+        }
+        
+        if( $context->has( "googleMapApiKey") ) {
+	        $this->headers[] = "X-Google-API-Key: " . $context->get("googleMapApiKey");
         }
 		
 		$this->logger->debug("Context: " . print_r($this->context->getAllValues(), true));
@@ -128,7 +132,7 @@ class InlineClient {
         $status  = $response->getResponseCode();
         $content = $response->getContent();
         $body = '';
-        if ($status == 200 || $status == 404) {
+        if ($status == 200 || $status == 404 || $status == 410 ) {
             // If the content type is text/plain we do some magic - we check that it begins
             // with text/plain in case it is followed by an encoding.
             if ($response->hasHeader('Content-Type')
@@ -141,6 +145,9 @@ class InlineClient {
             }
 
             if ($status == 404) {
+                $this->setInlineContent("title", "Not Found");
+            }
+            if ($status == 410) {
                 $this->setInlineContent("title", "Not Found");
             }
             return;
@@ -448,8 +455,19 @@ class InlineClient {
     private function getCookieHeader()
     {
         $cookie = "";
+        
+        if ( function_exists('getallheaders') && getallheaders() ) {
+	        $this->logger->debug( 'RAW COOKIE HEADER: ' . getallheaders()['Cookie'] );
+        }
+        elseif( !function_exists('getallheaders') ) {
+        	$this->logger->debug( 'RAW COOKIE HEADER: ' . $_SERVER['HTTP_Cookie'] );
+        }
+        
+        $this->logger->debug( '$_COOKIE: ' . $_COOKIE . " COUNT: " . count($_COOKIE) );
+
         if (count($_COOKIE)) {
             foreach ($_COOKIE as $name => $value) {
+            	$this->logger->debug( "COOKIE NAME: " . $name . " VALUE: " . $value );
                 if (is_array($value)) {
                     continue;
                 }
