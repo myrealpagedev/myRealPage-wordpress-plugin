@@ -67,6 +67,10 @@ class InlineClient {
         if ($context->has("permAttr")) {
             $this->headers[] = "Listing-ViewAttrs: " . $context->get("permAttr");
         }
+        
+        if( $context->has( "googleMapApiKey") ) {
+	        $this->headers[] = "X-Google-API-Key: " . $context->get("googleMapApiKey");
+        }
 		
 		$this->logger->debug("Context: " . print_r($this->context->getAllValues(), true));
 
