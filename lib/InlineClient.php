@@ -445,9 +445,18 @@ class InlineClient {
 	        }
         }
         
+        if ($context->has("detailsDef") ) {
+	        if( stripos( $url, '?' ) ) {
+		        $url .= '&noredir=true';
+	        }
+	        else {
+		        $url .= '?noredir=true';
+	        }
+        }
+        
         
         $this->logger->debug("Target MRP URL: " . $url );
-        //error_log("Target MRP URL: " . $url );
+        error_log("Target MRP URL: " . $url );
 
         return $url;
     }
