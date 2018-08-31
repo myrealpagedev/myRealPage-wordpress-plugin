@@ -1,11 +1,13 @@
 {
 	"name": "myRealPage IDX Listings",
-	"version": "0.9.29",
+	"version": "0.9.30",
 	"download_url": "https://github.com/myrealpagedev/myRealPage-wordpress-plugin/archive/master.zip",
 
 	"homepage": "https://myrealpage.com/",
 	"requires": "4.5",
 	"tested": "4.9.6",
+	"upgrade_notice": "Updated to use higher verison of PHP",
+
 
 	"author": "myRealPage",
 	"author_homepage": "https://myrealpage.com",
