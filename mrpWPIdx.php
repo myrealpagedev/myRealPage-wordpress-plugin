@@ -3,7 +3,7 @@
 /**
  * Plugin Name: myRealPage IDX Listings
  * Description: Embeds myRealPage IDX and Listings solution into WordPress. Uses shortcodes. Create a post or page and use integrated shortcode button to launch myRealPage Listings Shortcode Wizard and generate a shortcode based on your choice of listing content, as well as functional and visual preferences.
- * Version: 0.9.30
+ * Version: 0.9.31
  * Author: myRealPage (support@myrealpage.com)
  * Author URI: http://myrealpage.com
  **/
@@ -388,6 +388,12 @@ if (!class_exists('MRPListing')) {
             }
         }
 
+        public function nocacheHeaders()
+        {
+            header( "Cache-Control: no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0" );
+            header( "Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT" );
+        }
+
         public function replacedWP($wp)
         {
             global $wp_query, $post;
@@ -456,6 +462,8 @@ if (!class_exists('MRPListing')) {
                 $this->debug("Parsed Content: " . print_r($this->mrpData, true));
                 //$this->debug("Response Headers: " . print_r($client->getHeaders(), true));
                 $client->outputRegularHeaders();
+                $this->nocacheHeaders();
+
             }
         }
 
@@ -770,6 +778,7 @@ if (!class_exists('MRPListing')) {
                 $_SERVER['REQUEST_METHOD'] == 'POST' ? file_get_contents("php://input") : array(),
                 $this->cache
             );
+
             exit();
         }
 
@@ -950,6 +959,7 @@ if (!class_exists('MRPListing')) {
 
     $mrp = new MRPListing();
 }
+
 require 'plugin-update-checker.php';
 $myUpdateChecker = Puc_v4_Factory::buildUpdateChecker(
     'https://raw.githubusercontent.com/myrealpagedev/myRealPage-wordpress-plugin/master/details.json',
