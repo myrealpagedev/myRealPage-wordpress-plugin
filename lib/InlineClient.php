@@ -30,6 +30,7 @@ class InlineClient {
             "X-WordPress-Referer: " . ( isset( $_SERVER["HTTP_REFERER"] ) ? $_SERVER["HTTP_REFERER"] : "" ),
             "X-WordPress-Theme: " . get_template(),
             "X-MRP-TMPL: v2",
+            //"X-MRP-Server-Debug: true",
             "Cookie: " . $this->getCookieHeader()
         );
 
