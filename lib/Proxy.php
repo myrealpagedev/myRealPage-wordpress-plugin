@@ -34,6 +34,12 @@ class Proxy {
     private function isSecure() {
 		return	(!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || $_SERVER['SERVER_PORT'] == 443;
 	}
+	
+   	public function nocacheHeaders()
+    {
+        header( "Cache-Control: no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0" );
+        header( "Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT" );
+    }
 
     public function doProxy($uri, $postParams = array())
     {    
@@ -44,7 +50,7 @@ class Proxy {
         }
         
         $response = $this->proxy($uri, $postParams);
-
+        
         // handle redirects
         if ($response->isRedirect() && $response->hasHeader("Location")) {
            	
@@ -53,6 +59,9 @@ class Proxy {
 
             header("HTTP/1.1 " . $response->getResponseCodeWithString());
             header("Location: " . $location);
+            
+            $this->nocacheHeaders();
+            
             exit();
         }
 
@@ -99,6 +108,8 @@ $content = str_replace(
                 }
             }
         }
+        
+        $this->nocacheHeaders();
 
         echo($content);
     }

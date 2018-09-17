@@ -39,7 +39,7 @@ class FakePage
     /**
      * Class constructor
      */
-    function FakePage($aSlug, $aTitle, $aContent, $context = array())
+    function __construct( $aSlug, $aTitle, $aContent, $context = array())
     {
         /**
          * We'll wait til WordPress has looked for posts, and then

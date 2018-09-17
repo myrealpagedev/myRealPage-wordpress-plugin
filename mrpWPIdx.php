@@ -3,7 +3,7 @@
 /**
  * Plugin Name: myRealPage IDX Listings
  * Description: Embeds myRealPage IDX and Listings solution into WordPress. Uses shortcodes. Create a post or page and use integrated shortcode button to launch myRealPage Listings Shortcode Wizard and generate a shortcode based on your choice of listing content, as well as functional and visual preferences.
- * Version: 0.9.25
+ * Version: 0.9.32
  * Author: myRealPage (support@myrealpage.com)
  * Author URI: http://myrealpage.com
  **/
@@ -179,6 +179,9 @@ if (!class_exists('MRPListing')) {
             // may be detrimental, but if enabled allows proper generation of
             // breadcrumbs, etc.
             add_filter('the_title', array(&$this, 'customTheTitle'), 1, 2 );
+                       
+            // custom filter for Yoast
+            add_filter('wpseo_metadesc', array(&$this,'changeYoastDescription'),100,1);
             
             // add debug/error logs to end of page contents
             add_action("wp_footer", array(&$this, "outputLogs"));
@@ -305,8 +308,21 @@ if (!class_exists('MRPListing')) {
         {
             if (isset($this->mrpData["head"]) && !empty($this->mrpData["head"])) {
                 echo $this->mrpData["head"];
-                echo("<meta name=\"description\" content=\"" . $this->mrpData["description"] . '"/>');
+                $regex = isset($this->config["replaceable_titles"]) ? $this->config["replaceable_titles"] : "";
+				if( $regex != "" && preg_match($regex, $_SERVER['REQUEST_URI']) && isset($this->mrpData["title"]) ) {
+                	echo("<meta name=\"description\" content=\"" . $this->mrpData["description"] . '"/>');
+                }
             }
+        }
+        
+        /**
+        * Yoast filter
+        **/
+        public function changeYoastDescription($desc) {
+	        if( $regex != "" && preg_match($regex, $_SERVER['REQUEST_URI']) && isset($this->mrpData["title"]) ) {
+            	return false;
+            }
+            return $desc;
         }
 
         public function customTheTitle($title, $id = null)
@@ -324,7 +340,7 @@ if (!class_exists('MRPListing')) {
 	        			return $title . ' [p.' . $_GET['_pg'] . ']';
 	    			}
 	    			else {
-	    				return $title . ' [results]';
+	    				return $title . '';// ' [results]';
 	    			}
 				}
 				
@@ -371,6 +387,12 @@ if (!class_exists('MRPListing')) {
                 return false;
             }
         }
+        
+        public function nocacheHeaders()
+        {
+	        header( "Cache-Control: no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0" );
+	        header( "Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT" );
+        }
 
         public function replacedWP($wp)
         {
@@ -413,7 +435,8 @@ if (!class_exists('MRPListing')) {
                 $context = new \MRPIDX\Context($attrs);
                 
                 //error_log( "ATTS: " . print_r( $attrs, true ) );
-                if( isset($attrs["searchform_def"]) && $attrs["searchform_def"] != "" ) {	
+                if( isset($attrs["searchform_def"]) && $attrs["searchform_def"] != "" && 
+                	( !isset($attrs["extension"]) || $attrs["extension"] == "" )) {	
 	                // no remote call on search form IDX              	
 	              	return;  
                 }
@@ -440,6 +463,8 @@ if (!class_exists('MRPListing')) {
                 $this->debug("Parsed Content: " . print_r($this->mrpData, true));
                 //$this->debug("Response Headers: " . print_r($client->getHeaders(), true));
                 $client->outputRegularHeaders();
+                $this->nocacheHeaders();
+
             }
         }
 
@@ -459,10 +484,14 @@ if (!class_exists('MRPListing')) {
          **/
         public function replaceContent($attrs, $content = '')
         {
-            if (isset($attrs["searchform_def"]) && $attrs["searchform_def"] != "" ) {
+        	$ext = $this->getExtension($wp_query);
+            if (isset($attrs["searchform_def"]) && $attrs["searchform_def"] != "" && 
+                	( !isset($ext) || $ext == "" )) {
                 // create a client for operating within the new (local) context
                 //$client = new \MRPIDX\InlineClient($this->logger, new \MRPIDX\Context($attrs));
                 //return $client->getEmbeddedFormJS();
+                //error_log( "replaceContent $attrs: ". print_r( $attrs, true ) );
+                //error_log( "replaceContent: bypass for searchform_def" );
                 
                 $script1= "\n<script src='//" . \MRPIDX\InlineClient::RES_SERVER . 
                 	"/wps/rest/" . $attrs["account_id"] . "/l/recip/tmpl2.js'></script>\n";
@@ -537,7 +566,10 @@ if (!class_exists('MRPListing')) {
             $this->logger->debug( "pagename: " . $pagename );
             //$this->logger->debug( "result: " . print_r( $result, true ) );
             
-            $page_by_slug = get_page_by_path( $pagename );
+            $page_by_slug = get_page_by_path( $pagename, OBJECT, 'page' );
+            if( !$page_by_slug ) {
+	            $page_by_slug = get_page_by_path( $pagename, OBJECT, 'post' );
+            }
             $this->logger->debug( "page_by_slug: " . print_r( $page_by_slug, true ) );
 
             //if (count($result)) {
@@ -640,6 +672,8 @@ if (!class_exists('MRPListing')) {
             foreach ($regexes as $regex => $cached) {
                 if ($regex && preg_match("/$regex/i", $url)) {
                 	$this->debug( "Matched managed URL expression: ". $regex );
+                	error_log( "Matched managed URL expression: ". $regex );
+
                     return true;
                 }
             }
@@ -751,6 +785,7 @@ if (!class_exists('MRPListing')) {
                 $_SERVER['REQUEST_METHOD'] == 'POST' ? file_get_contents("php://input") : array(),
                 $this->cache
             );
+                        
             exit();
         }
 

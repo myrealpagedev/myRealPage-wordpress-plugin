@@ -30,6 +30,7 @@ class InlineClient {
             "X-WordPress-Referer: " . ( isset( $_SERVER["HTTP_REFERER"] ) ? $_SERVER["HTTP_REFERER"] : "" ),
             "X-WordPress-Theme: " . get_template(),
             "X-MRP-TMPL: v2",
+            //"X-MRP-Server-Debug: true",
             "Cookie: " . $this->getCookieHeader()
         );
 
@@ -159,7 +160,6 @@ class InlineClient {
             if (!$response->hasHeader("Location")) {
                 // redirect with no location header
                 error_log( "no location: " . $response->getHeader('Location') );
-
                 return;
             }
 
@@ -167,6 +167,10 @@ class InlineClient {
             $location = $response->getHeader('Location');
             //error_log( "REDIRECT: " . $location );
             $location = preg_replace('@http://(.+?)/(.*)@', ( $this->isSecure() ? 'https://' : 'http://' ) .$_SERVER['HTTP_HOST'].'/$2', $location);
+            
+            if( substr( $location, -1 ) != "/" ) {
+	            $location .= "/";
+            }
             //error_log( "REDIRECT2: " . $location );
             $this->client->setResponseHeader("Location", $location);
         }
@@ -442,6 +446,15 @@ class InlineClient {
 	        }
 	        else {
 		        $url .= '?' . $inqueryString;
+	        }
+        }
+        
+        if ($context->has("detailsDef") ) {
+	        if( stripos( $url, '?' ) ) {
+		        $url .= '&noredir=true';
+	        }
+	        else {
+		        $url .= '?noredir=true';
 	        }
         }
         
