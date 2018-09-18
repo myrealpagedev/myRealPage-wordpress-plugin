@@ -3,7 +3,7 @@
 /**
  * Plugin Name: myRealPage IDX Listings
  * Description: Embeds myRealPage IDX and Listings solution into WordPress. Uses shortcodes. Create a post or page and use integrated shortcode button to launch myRealPage Listings Shortcode Wizard and generate a shortcode based on your choice of listing content, as well as functional and visual preferences.
- * Version: 0.9.31
+ * Version: 0.9.32
  * Author: myRealPage (support@myrealpage.com)
  * Author URI: http://myrealpage.com
  **/
@@ -50,7 +50,7 @@ if (!class_exists('MRPListing')) {
 
             // load configuration as an option, or if not present, grab the default
             $config = $this->getOption(self::CONFIG_OPT_NAME);
-            //$config = '';
+            //$config = ''; 
             $this->config = $config && strlen(trim($config))
                 ? json_decode($config,true)
                 : $this->defaultConfig();
@@ -143,7 +143,7 @@ if (!class_exists('MRPListing')) {
         }
 
         public function registerHooks()
-        {
+        {        
             // flush rewrites on post/page save and front page option setting changes
             add_filter('save_post', array(&$this, 'flushRules'));
             add_filter('update_option_page_on_front', array(&$this, 'flushRules'));
@@ -153,7 +153,7 @@ if (!class_exists('MRPListing')) {
             add_filter( 'body_class',array(&$this, 'bodyClass') );
             // register with shortcode API to do content replacement.
             add_shortcode(self::SHORTCODE_NAME, array(&$this, 'replaceContent'));
-
+            
             // init method to trap /wps/evow/ requests
             add_action('init', array(&$this, 'evowAndRecipHandler'));
             add_action('init', array(&$this, 'handleRequest'));
@@ -163,7 +163,7 @@ if (!class_exists('MRPListing')) {
 
             // generates saved values.
             add_action('wp', array(&$this, 'replacedWP'));
-
+            
             // adds merged MRP header.
             add_action('wp_head', array(&$this, 'addHeader'));
 
@@ -175,17 +175,17 @@ if (!class_exists('MRPListing')) {
             add_filter('get_post_metadata', array(&$this, 'getPostMetadata'), 99, 4);
 
             // this needs attention: this can be called for a variety of posts
-            // within ANY url to get titles, for generating menus, etc. This
+            // within ANY url to get titles, for generating menus, etc. This 
             // may be detrimental, but if enabled allows proper generation of
             // breadcrumbs, etc.
             add_filter('the_title', array(&$this, 'customTheTitle'), 1, 2 );
-
+                       
             // custom filter for Yoast
             add_filter('wpseo_metadesc', array(&$this,'changeYoastDescription'),100,1);
-
+            
             // add debug/error logs to end of page contents
             add_action("wp_footer", array(&$this, "outputLogs"));
-
+            
             // dd admin/options menu
             add_action('admin_menu', array(&$this, 'addMenu'));
             // buttons for MRP shortcode in the editor
@@ -198,21 +198,21 @@ if (!class_exists('MRPListing')) {
             add_action('admin_print_scripts', array(&$this, 'loadAdminScripts'));
             // any tasks that ought to be run in the background (hourly)
             add_action("mrpidx_hourly_event_hook", array(&$this, "performHourlyTasks"));
-
+            
             add_action( "admin_enqueue_scripts", array(&$this,"adminScripts" ));
-
+            
         }
-
+        
         public function adminScripts() {
-            wp_register_script('mrp-sc-editor', plugins_url('mrp_sc_editor.js?v1', __FILE__), array('jquery'), '1.0.12');
+	        wp_register_script('mrp-sc-editor', plugins_url('mrp_sc_editor.js?v1', __FILE__), array('jquery'), '1.0.12');
         }
-
+        
         public function bodyClass( $classes ) {
-            if( isset( $this->mrpData["listing_content_type"] ) && $this->mrpData["listing_content_type"] != "" ) {
-                $classes[] = ( "mrp-listings-" . $this->mrpData["listing_content_type"] );
-            }
-
-            return $classes;
+        	if( isset( $this->mrpData["listing_content_type"] ) && $this->mrpData["listing_content_type"] != "" ) {
+	        	$classes[] = ( "mrp-listings-" . $this->mrpData["listing_content_type"] );
+        	}
+	        
+	        return $classes;
         }
 
         public function addMenu()
@@ -309,52 +309,52 @@ if (!class_exists('MRPListing')) {
             if (isset($this->mrpData["head"]) && !empty($this->mrpData["head"])) {
                 echo $this->mrpData["head"];
                 $regex = isset($this->config["replaceable_titles"]) ? $this->config["replaceable_titles"] : "";
-                if( $regex != "" && preg_match($regex, $_SERVER['REQUEST_URI']) && isset($this->mrpData["title"]) ) {
-                    echo("<meta name=\"description\" content=\"" . $this->mrpData["description"] . '"/>');
+				if( $regex != "" && preg_match($regex, $_SERVER['REQUEST_URI']) && isset($this->mrpData["title"]) ) {
+                	echo("<meta name=\"description\" content=\"" . $this->mrpData["description"] . '"/>');
                 }
             }
         }
-
+        
         /**
         * Yoast filter
         **/
         public function changeYoastDescription($desc) {
-            if( $regex != "" && preg_match($regex, $_SERVER['REQUEST_URI']) && isset($this->mrpData["title"]) ) {
-                return false;
+	        if( $regex != "" && preg_match($regex, $_SERVER['REQUEST_URI']) && isset($this->mrpData["title"]) ) {
+            	return false;
             }
             return $desc;
         }
 
         public function customTheTitle($title, $id = null)
         {
-            if( $id == -1 ) { // we have our synthetic page
+        	if( $id == -1 ) { // we have our synthetic page
 
-                // special case for /evow/, we also make sure that we are not in listing details, in which case other rules apply (i.e. customTitle() check)
-                if( preg_match( '/.*\/evow\/.*/i', $_SERVER['REQUEST_URI'] ) && $this->customTitle($title) == $title ) {
-                    return 'Found Listings';
-                }
-
-                // special case for navigation:
-                if( preg_match( '/.*\/searchresults\.form.*/i', $_SERVER['REQUEST_URI']) ) {
-                    if( $_GET['_pg'] != '' ) {
-                        return $title . ' [p.' . $_GET['_pg'] . ']';
-                    }
-                    else {
-                        return $title . '';// ' [results]';
-                    }
-                }
-
-                // make sure we are responsible for the title as well
-                $regex = isset($this->config["replaceable_titles"]) ? $this->config["replaceable_titles"] : "";
-                if( $regex != "" && preg_match($regex, $_SERVER['REQUEST_URI']) && isset($this->mrpData["title"]) ) {
-                    return $this->mrpData["title"];
-                }
-                //error_log( "SYNTHETIC TITLE!!!: " . $this->mrpData["title"] );
-            }
+        		// special case for /evow/, we also make sure that we are not in listing details, in which case other rules apply (i.e. customTitle() check)
+        		if( preg_match( '/.*\/evow\/.*/i', $_SERVER['REQUEST_URI'] ) && $this->customTitle($title) == $title ) {
+	        		return 'Found Listings';
+        		}
+        		
+        		// special case for navigation:
+				if( preg_match( '/.*\/searchresults\.form.*/i', $_SERVER['REQUEST_URI']) ) {
+	    			if( $_GET['_pg'] != '' ) {
+	        			return $title . ' [p.' . $_GET['_pg'] . ']';
+	    			}
+	    			else {
+	    				return $title . '';// ' [results]';
+	    			}
+				}
+				
+				// make sure we are responsible for the title as well
+				$regex = isset($this->config["replaceable_titles"]) ? $this->config["replaceable_titles"] : "";
+				if( $regex != "" && preg_match($regex, $_SERVER['REQUEST_URI']) && isset($this->mrpData["title"]) ) {
+	        		return $this->mrpData["title"];
+        		}
+	        	//error_log( "SYNTHETIC TITLE!!!: " . $this->mrpData["title"] );
+        	}
             return $title;
         }
-
-
+        
+                
         public function customTitle($title)
         {
             $regex = isset($this->config["replaceable_titles"]) ? $this->config["replaceable_titles"] : "";
@@ -387,22 +387,22 @@ if (!class_exists('MRPListing')) {
                 return false;
             }
         }
-
+        
         public function nocacheHeaders()
         {
-            header( "Cache-Control: no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0" );
-            header( "Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT" );
+	        header( "Cache-Control: no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0" );
+	        header( "Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT" );
         }
 
         public function replacedWP($wp)
         {
             global $wp_query, $post;
-
+            
             // if the admin is currently loaded, we don't do any work
             if (is_admin()) {
                 return;
             }
-
+            
             //error_log( "replacedWP" . print_r( $post, true ) );
 
             // check whether we have an MRP shortcode, and process it
@@ -413,7 +413,7 @@ if (!class_exists('MRPListing')) {
                 $hit = preg_match('/' . get_shortcode_regex(array('mrp')) . '/', $post->post_content, $matches);
                 $this->debug("Shortcode found: " . ($hit ? "yes" : "no" ));
                 $attrs = shortcode_parse_atts($matches[0]);
-
+				
                 unset($attrs[0]);
                 unset($attrs[1]);
 
@@ -430,14 +430,15 @@ if (!class_exists('MRPListing')) {
                         "debug"           => $this->getOption(self::DEBUG_OPT_NAME),
                         "googleMapApiKey" => $this->getOption(self::GOOGLE_MAP_API_KEY)
                     );
-
-                //error_log( "$attrs: ". print_r( $attrs, true ) );
+                    
+				//error_log( "$attrs: ". print_r( $attrs, true ) );
                 $context = new \MRPIDX\Context($attrs);
-
+                
                 //error_log( "ATTS: " . print_r( $attrs, true ) );
-                if( isset($attrs["searchform_def"]) && $attrs["searchform_def"] != "" ) {
-                    // no remote call on search form IDX
-                    return;
+                if( isset($attrs["searchform_def"]) && $attrs["searchform_def"] != "" && 
+                	( !isset($attrs["extension"]) || $attrs["extension"] == "" )) {	
+	                // no remote call on search form IDX              	
+	              	return;  
                 }
 
 
@@ -483,19 +484,23 @@ if (!class_exists('MRPListing')) {
          **/
         public function replaceContent($attrs, $content = '')
         {
-            if (isset($attrs["searchform_def"]) && $attrs["searchform_def"] != "" ) {
+        	$ext = $this->getExtension($wp_query);
+            if (isset($attrs["searchform_def"]) && $attrs["searchform_def"] != "" && 
+                	( !isset($ext) || $ext == "" )) {
                 // create a client for operating within the new (local) context
                 //$client = new \MRPIDX\InlineClient($this->logger, new \MRPIDX\Context($attrs));
                 //return $client->getEmbeddedFormJS();
-
-                $script1= "\n<script src='//" . \MRPIDX\InlineClient::RES_SERVER .
-                    "/wps/rest/" . $attrs["account_id"] . "/l/recip/tmpl2.js'></script>\n";
-                $script2 = "<script src='//" . \MRPIDX\InlineClient::RES_SERVER .
-                    "/wps/js/ng/v2/listings/listings-wp-button.js' id='idx-button-script' data-account='" .
-                        $attrs["account_id"] . "' data-init-attr='" . ($attrs["init_attr"] ? $attrs["init_attr"] : "" ) . "'></script>\n";
-
+                //error_log( "replaceContent $attrs: ". print_r( $attrs, true ) );
+                //error_log( "replaceContent: bypass for searchform_def" );
+                
+                $script1= "\n<script src='//" . \MRPIDX\InlineClient::RES_SERVER . 
+                	"/wps/rest/" . $attrs["account_id"] . "/l/recip/tmpl2.js'></script>\n";
+                $script2 = "<script src='//" . \MRPIDX\InlineClient::RES_SERVER . 
+                	"/wps/js/ng/v2/listings/listings-wp-button.js' id='idx-button-script' data-account='" . 
+                		$attrs["account_id"] . "' data-init-attr='" . ($attrs["init_attr"] ? $attrs["init_attr"] : "" ) . "'></script>\n";
+                
                 return $script1 . $script2;
-
+                
             } else {
                 $content = $this->mrpData["body"];
                 return $content;
@@ -526,58 +531,58 @@ if (!class_exists('MRPListing')) {
         {
             global $wpdb;
             $uri  = $_SERVER["REQUEST_URI"];
-
+            
             $this->logger->debug( "This is managed URL: ". $uri . "|" . $this->isManagedUrl($uri) );
             //error_log( "This is managed URL: ". $uri . "|" . $this->isManagedUrl($uri) );
-
+            
             // redirect URLs with "/l/" from the old plugin
-            if( strstr( $uri, "/l/" ) && !strstr( $uri, "/wps/" ) && !strstr( strtolower($uri), "/unibox.search" ) ) {
-                header('Location: ' . str_replace( "/l/", "/", $uri ) );
-                die();
-            }
+			if( strstr( $uri, "/l/" ) && !strstr( $uri, "/wps/" ) && !strstr( strtolower($uri), "/unibox.search" ) ) { 
+				header('Location: ' . str_replace( "/l/", "/", $uri ) );
+				die();
+			}
 
             // nothing to do if this isn't a managed URL
             if (!$this->isManagedUrl($uri) || strstr($uri, "/gmform15/")) {
                 return;
             }
-
+            
             // strip off the extension part, and grab our page name from the slug
             list($pagename, $extension) = $this->processManagedUrl($uri);
             error_log( "handleRequest: " . $pagename . ":" . $extension );
-
+            
             $searchname = $pagename;
-
+            
             // in case we get a subpage, i.e. something/somewhere as $pagename, use the last segment
             if( strripos( "$pagename", '/' ) ) {
-                $searchname = substr( $pagename, strripos( "$pagename", '/' ) + 1 );
-                //error_log( "SEARCHNAME: ". $searchname );
+	            $searchname = substr( $pagename, strripos( "$pagename", '/' ) + 1 );
+	            //error_log( "SEARCHNAME: ". $searchname );
             }
-
+            
             // find the page, based on page name
             //$query  = $wpdb->prepare("SELECT * FROM {$wpdb->posts} WHERE post_name=%s", $searchname);
             //$result = $wpdb->get_results($query, OBJECT_K);
-
+            
             $this->logger->debug( "searchname: " . $searchname );
             $this->logger->debug( "pagename: " . $pagename );
             //$this->logger->debug( "result: " . print_r( $result, true ) );
-
+            
             $page_by_slug = get_page_by_path( $pagename, OBJECT, 'page' );
             if( !$page_by_slug ) {
-                $page_by_slug = get_page_by_path( $pagename, OBJECT, 'post' );
+	            $page_by_slug = get_page_by_path( $pagename, OBJECT, 'post' );
             }
             $this->logger->debug( "page_by_slug: " . print_r( $page_by_slug, true ) );
 
             //if (count($result)) {
-            if( $page_by_slug ) {
-
-                $result = $page_by_slug;
+			if( $page_by_slug ) {
+			
+				$result = $page_by_slug;
 
                 // generate content for this page using the "parent" page
                 require_once("fakepage.php");
                 //$result     = reset($result); // first element in array
                 $requestUri = $_SERVER["REQUEST_URI"];
                 $slug       = substr($requestUri, 1);
-
+                                
                 if (stripos($requestUri, '?')) {
                     $slug = substr($slug, 0, stripos($requestUri, '?') - 1);
                 }
@@ -588,7 +593,7 @@ if (!class_exists('MRPListing')) {
                 );
                 $synthetic = new FakePage($slug, $result->post_title, $result->post_content, $context );
                 $this->synthetic_page = $synthetic;
-
+                
                 return $synthetic;
             } else {
 
@@ -627,10 +632,10 @@ if (!class_exists('MRPListing')) {
 
         private function processManagedUrl($url)
         {
-            if (stripos($url, '?')) {
+        	if (stripos($url, '?')) {
                 $url = substr($url, 0, stripos($url, '?'));
             }
-
+            
             //error_log( "processManagedUrl: ". $url );
 
             $regexes = $this->config && isset($this->config["managed_urls"]) ? $this->config["managed_urls"] : array();
@@ -638,11 +643,11 @@ if (!class_exists('MRPListing')) {
                 // modify the regex to break out the slug and extension (if present)
                 $regex = "/^(?P<slug>.+?)(?P<extension>$regex)/i";
                 if (preg_match($regex, $url, $matches)) {
-                    $ext = $matches["extension"];
-                    if( strpos( $ext, "/l/" ) == 0 ) {
-                        $ext = str_replace( "/l/", "/", $ext );
-                    }
-                    error_log( "processed extension: ". $ext );
+                	$ext = $matches["extension"];
+                	if( strpos( $ext, "/l/" ) == 0 ) {
+	                	$ext = str_replace( "/l/", "/", $ext );
+                	}
+                	error_log( "processed extension: ". $ext );
 
                     return array(
                         $this->stripLeadingSlash($matches["slug"]),
@@ -666,7 +671,9 @@ if (!class_exists('MRPListing')) {
             $regexes = $this->config && isset($this->config["managed_urls"]) ? $this->config["managed_urls"] : array();
             foreach ($regexes as $regex => $cached) {
                 if ($regex && preg_match("/$regex/i", $url)) {
-                    $this->debug( "Matched managed URL expression: ". $regex );
+                	$this->debug( "Matched managed URL expression: ". $regex );
+                	error_log( "Matched managed URL expression: ". $regex );
+
                     return true;
                 }
             }
@@ -685,25 +692,25 @@ if (!class_exists('MRPListing')) {
                     die();
                 }
             }
-
-            // issue a redirect if we are seeing /wps/recip/XX/idx.search
+            
+            // issue a redirect if we are seeing /wps/recip/XX/idx.search 
             // this may happen if a vow search is loaded for editing
             // Also: only GET check, because 'POST' is used for actual searching
             if ( $_SERVER['REQUEST_METHOD'] == 'GET' && preg_match('@^/wps/recip/\d+/(.+.search|search.form)@i', $requestUri)) {
                 preg_match('@^/wps/recip/(.*)@', $requestUri, $matches);
                 if (isset($matches[1])) {
-                    //header("HTTP/1.1 301 Moved Permanently");
+                	//header("HTTP/1.1 301 Moved Permanently");
                     header('Location: /recip-' . $matches[1]);
                     die();
                 }
             }
-
+            
             // empty '/recip-xxx' or /recip-xxx/ -> redirect to /recip-xxx/idx.search
             if( preg_match( '@^/recip\-(\d+)[/]{0,1}$@', $requestUri, $matches ) ) {
-                    header('Location: /recip-' . $matches[1] . "/idx.search" );
+	                header('Location: /recip-' . $matches[1] . "/idx.search" );
                     die();
             }
-
+            
             if (preg_match('@^/evow-\d+@', $requestUri)) {
                 require_once('fakepage.php');
                 $slug = substr($requestUri, 1);
@@ -718,7 +725,7 @@ if (!class_exists('MRPListing')) {
                     new FakePage($slug, '  ', '<p>Malformed URL (no account ID given)</p>');
                 }
             }
-
+            
             if (preg_match('@^/recip-\d+@', $requestUri)) {
                 require_once('fakepage.php');
                 $slug = substr($requestUri, 1);
@@ -739,9 +746,9 @@ if (!class_exists('MRPListing')) {
         {
             // get current request URI and determine if we need to proxy it
             $requestUri = $_SERVER['REQUEST_URI'];
-
+            
             if( preg_match( '/^\/wps\/evow\//', $requestUri ) ) {
-                return;
+	            return;
             }
 
             // no proxying to do, so we're done
@@ -750,7 +757,7 @@ if (!class_exists('MRPListing')) {
             }
 
 
-            $context = new \MRPIDX\Context(
+			$context = new \MRPIDX\Context(
                 array(
                     "debug"           => $this->options[self::DEBUG_OPT_NAME],
                     "pageName"        => $this->getPageName(),
@@ -759,15 +766,15 @@ if (!class_exists('MRPListing')) {
                 )
             );
             $client = new MRPIDX\InlineClient($this->logger, $context);
-
-            preg_match('@^/recip-(\d+)/.*@', $requestUri, $matches);
-            if (isset($matches[1])) {
-                $requestUri = "/wps/-/noframe~1,tmpl~v2/recip/" . $matches[1] . "/idx.search";
-                $inqueryString = $_SERVER['QUERY_STRING'];
-                if( $inqueryString ) {
-                    $requestUri .= "?" . $inqueryString;
-                }
-                //error_log( "IDX_SEARCH URL: " . $requestUri );
+            
+			preg_match('@^/recip-(\d+)/.*@', $requestUri, $matches);
+	        if (isset($matches[1])) {
+	        	$requestUri = "/wps/-/noframe~1,tmpl~v2/recip/" . $matches[1] . "/idx.search";
+	        	$inqueryString = $_SERVER['QUERY_STRING'];
+				if( $inqueryString ) {
+					$requestUri .= "?" . $inqueryString;
+				}
+	        	//error_log( "IDX_SEARCH URL: " . $requestUri );
             }
 
             //error_log("Direct Proxying: " . $requestUri);
@@ -778,7 +785,7 @@ if (!class_exists('MRPListing')) {
                 $_SERVER['REQUEST_METHOD'] == 'POST' ? file_get_contents("php://input") : array(),
                 $this->cache
             );
-
+                        
             exit();
         }
 
@@ -845,16 +852,16 @@ if (!class_exists('MRPListing')) {
         {
             global $post;
 
-            $url = $_SERVER["REQUEST_URI"];
+			$url = $_SERVER["REQUEST_URI"];
 
             // extract the page name based on either the post permalink, or if this is an MRP-managed
             // URL, remove the extension first
             $pageName = "";
-
+            
             if( isset( $post ) ) {
-                $pageName = substr(str_replace($this->blogURI, '', get_permalink($post->ID)), 1);
+            	$pageName = substr(str_replace($this->blogURI, '', get_permalink($post->ID)), 1);
             }
-
+                        
             if ($this->isManagedUrl($url)) {
                 list($pageName, $extension) = $this->processManagedUrl($url);
                 //error_log( $pageName . ":" . $extension . ":" . $url );
@@ -881,32 +888,32 @@ if (!class_exists('MRPListing')) {
             $config = array();
             $config["version"] = "0.0";
             $config["managed_urls"] = array(
-                '\/externalview\.form'           => false,
-                '\/evow\/.*'                     => false,
-                '\/browse\/.*'                   => false,
-                '^\/wps\/'                       => false,
-                '\/[0-9]+\.search.*'             => false,
-                '\/[0-9]+\.vowsearch.*'          => false,
-                '\/vowcategory\.form.*'          => false,
-                '\/idx\.search'                  => false,
-                '\/listing\..*'                    => false,
-                '\/searchresults\.form'          => false,
-                '\/unibox\.search'               => false,
-                '\/search\.form'                 => false,
-                '\/details-[0-9]+'               => false,
-                '\/photos-[0-9]+'                => false,
-                '\/videos-[0-9]+'                => false,
-                '\/floor-plans-[0-9]+'           => false,
-                '\/map-[0-9]+'                   => false,
-                '\/print-[0-9]+'                 => false,
-                '\/listingdetails\.form'         => false,
-                '\/listingphotos\.form'          => false,
-                '\/listingvideos\.form'          => false,
-                '\/listingfloorplans\.form'      => false,
-                '\/listinggooglemap\.form'       => false,
-                '\/listingwalkscore\.form'       => false,
-                '\/gmform15\/(js|dist|font)\/.*' => true
-            );
+			    '\/externalview\.form'           => false,
+			    '\/evow\/.*'                     => false,
+			    '\/browse\/.*'                   => false,
+			    '^\/wps\/'                       => false,
+			    '\/[0-9]+\.search.*'             => false,
+			    '\/[0-9]+\.vowsearch.*'          => false,
+			    '\/vowcategory\.form.*'          => false,
+			    '\/idx\.search'                  => false,
+			    '\/listing\..*'                    => false,
+			    '\/searchresults\.form'          => false,
+			    '\/unibox\.search'               => false,
+			    '\/search\.form'                 => false,
+			    '\/details-[0-9]+'               => false,
+			    '\/photos-[0-9]+'                => false,
+			    '\/videos-[0-9]+'                => false,
+			    '\/floor-plans-[0-9]+'           => false,
+			    '\/map-[0-9]+'                   => false,
+			    '\/print-[0-9]+'                 => false,
+			    '\/listingdetails\.form'         => false,
+			    '\/listingphotos\.form'          => false,
+			    '\/listingvideos\.form'          => false,
+			    '\/listingfloorplans\.form'      => false,
+			    '\/listinggooglemap\.form'       => false,
+			    '\/listingwalkscore\.form'       => false,
+			    '\/gmform15\/(js|dist|font)\/.*' => true
+			);
             // regex for URL patterns where we do title replacement
             $config["replaceable_titles"] = '@.*/(listing\..+|details\-|photos\-|videos\-|map\-|walkscore\-|'
                 . 'print\-|ListingPrint\.form|ListingWalkScore\.form|'
@@ -924,7 +931,7 @@ if (!class_exists('MRPListing')) {
          */
         public function updateConfig()
         {
-            // fetch the file
+        	// fetch the file
             $client = new \MRPIDX\HTTP\Client( "http://" . MRPIDX\InlineClient::SERVER . self::CONFIG_LOCATION);
             $client->makeRequest();
             $response = $client->getResponse();
@@ -949,7 +956,7 @@ if (!class_exists('MRPListing')) {
                     $this->logger->debug("Updating config from " . $current . " to " . $config["version"]);
                 }
                 else {
-                    //error_log( "Config update skipped: version same or lower: " . $config["version"] );
+	                //error_log( "Config update skipped: version same or lower: " . $config["version"] );
                 }
             } else {
                 $this->logger->warn("Could not update configuration from: " . self::CONFIG_LOCATION);
@@ -959,7 +966,6 @@ if (!class_exists('MRPListing')) {
 
     $mrp = new MRPListing();
 }
-
 require 'plugin-update-checker.php';
 $myUpdateChecker = Puc_v4_Factory::buildUpdateChecker(
     'https://raw.githubusercontent.com/myrealpagedev/myRealPage-wordpress-plugin/master/details.json',

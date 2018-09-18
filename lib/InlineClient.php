@@ -160,7 +160,6 @@ class InlineClient {
             if (!$response->hasHeader("Location")) {
                 // redirect with no location header
                 error_log( "no location: " . $response->getHeader('Location') );
-
                 return;
             }
 
@@ -168,6 +167,10 @@ class InlineClient {
             $location = $response->getHeader('Location');
             //error_log( "REDIRECT: " . $location );
             $location = preg_replace('@http://(.+?)/(.*)@', ( $this->isSecure() ? 'https://' : 'http://' ) .$_SERVER['HTTP_HOST'].'/$2', $location);
+            
+            if( substr( $location, -1 ) != "/" ) {
+	            $location .= "/";
+            }
             //error_log( "REDIRECT2: " . $location );
             $this->client->setResponseHeader("Location", $location);
         }
@@ -457,7 +460,7 @@ class InlineClient {
         
         
         $this->logger->debug("Target MRP URL: " . $url );
-        error_log("Target MRP URL: " . $url );
+        //error_log("Target MRP URL: " . $url );
 
         return $url;
     }
