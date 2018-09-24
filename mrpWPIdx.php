@@ -403,11 +403,25 @@ if (!class_exists('MRPListing')) {
                 return;
             }
             
-            //error_log( "replacedWP" . print_r( $post, true ) );
+            // error_log( "replacedWP" . print_r( $post, true ) );
 
             // check whether we have an MRP shortcode, and process it
             $this->debug( "Has shortcode: " . ( has_shortcode($post->post_content, 'mrp') ? "Yes" : "No" ) );
             if ( isset($post) && has_shortcode($post->post_content, 'mrp')) {
+            
+            	// add trailing slash if necessary; otherwise listing details don't work
+				$permalinkStructure = get_option("permalink_structure");
+                if ( $_SERVER['REQUEST_METHOD'] == 'GET' && $permalinkStructure && substr($permalinkStructure, -1) == "/") {
+                	
+                	$parts = explode('?', $_SERVER['REQUEST_URI'], 2);
+                	if (substr($parts[0], -1) !== '/') {
+                		error_log( 'TRAILING SLASH FIX: ' . $_SERVER['REQUEST_URI'] );
+					    $uri = $parts[0].'/'.(isset($parts[1]) ? '?'.$parts[1] : '');
+					    header('Location: '.$uri, true, 302);
+					    die();
+					}					
+                }
+
 
                 // extract just the 'mrp' shortcode, parse attributes and create a context object
                 $hit = preg_match('/' . get_shortcode_regex(array('mrp')) . '/', $post->post_content, $matches);
@@ -444,7 +458,6 @@ if (!class_exists('MRPListing')) {
 
                 $client = new \MRPIDX\InlineClient($this->logger, $context);
                 $client->processInline();
-
                 if ($client->isRedirect()) {
                     // handle redirection
                     $client->outputHeaders();
@@ -484,6 +497,7 @@ if (!class_exists('MRPListing')) {
          **/
         public function replaceContent($attrs, $content = '')
         {
+        	global $wp_query;
         	$ext = $this->getExtension($wp_query);
             if (isset($attrs["searchform_def"]) && $attrs["searchform_def"] != "" && 
                 	( !isset($ext) || $ext == "" )) {
@@ -533,7 +547,7 @@ if (!class_exists('MRPListing')) {
             $uri  = $_SERVER["REQUEST_URI"];
             
             $this->logger->debug( "This is managed URL: ". $uri . "|" . $this->isManagedUrl($uri) );
-            //error_log( "This is managed URL: ". $uri . "|" . $this->isManagedUrl($uri) );
+            error_log( "This is managed URL: ". $uri . "|" . $this->isManagedUrl($uri) );
             
             // redirect URLs with "/l/" from the old plugin
 			if( strstr( $uri, "/l/" ) && !strstr( $uri, "/wps/" ) && !strstr( strtolower($uri), "/unibox.search" ) ) { 
@@ -571,6 +585,7 @@ if (!class_exists('MRPListing')) {
 	            $page_by_slug = get_page_by_path( $pagename, OBJECT, 'post' );
             }
             $this->logger->debug( "page_by_slug: " . print_r( $page_by_slug, true ) );
+            //error_log( "page_by_slug: " . print_r( $page_by_slug, true ) );
 
             //if (count($result)) {
 			if( $page_by_slug ) {
@@ -647,7 +662,7 @@ if (!class_exists('MRPListing')) {
                 	if( strpos( $ext, "/l/" ) == 0 ) {
 	                	$ext = str_replace( "/l/", "/", $ext );
                 	}
-                	error_log( "processed extension: ". $ext );
+                	//error_log( "processed extension: ". $ext );
 
                     return array(
                         $this->stripLeadingSlash($matches["slug"]),
@@ -672,7 +687,7 @@ if (!class_exists('MRPListing')) {
             foreach ($regexes as $regex => $cached) {
                 if ($regex && preg_match("/$regex/i", $url)) {
                 	$this->debug( "Matched managed URL expression: ". $regex );
-                	error_log( "Matched managed URL expression: ". $regex );
+                	//error_log( "Matched managed URL expression: ". $regex );
 
                     return true;
                 }
