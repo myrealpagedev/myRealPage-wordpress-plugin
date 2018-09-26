@@ -476,7 +476,7 @@ class InlineClient {
         	$this->logger->debug( 'RAW COOKIE HEADER: ' . $_SERVER['HTTP_Cookie'] );
         }
         
-        $this->logger->debug( '$_COOKIE: ' . $_COOKIE . " COUNT: " . count($_COOKIE) );
+        $this->logger->debug( '$_COOKIE: ' . print_r($_COOKIE,true) . " COUNT: " . count($_COOKIE) );
 
         if (count($_COOKIE)) {
             foreach ($_COOKIE as $name => $value) {
