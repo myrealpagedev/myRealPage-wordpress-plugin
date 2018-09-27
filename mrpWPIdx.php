@@ -584,6 +584,10 @@ if (!class_exists('MRPListing')) {
             if( !$page_by_slug ) {
 	            $page_by_slug = get_page_by_path( $pagename, OBJECT, 'post' );
 	            if( !$page_by_slug ) {
+	            	// looking up pages by path is the correct way to go about it as pages may be some/page
+	            	// however, it seems in some cases pages displaying under /some/page/ are not actually lookup-able
+	            	// by the path; here is our fallback on the post_name in such cases; in this last case
+	            	// there cannot be /some/post and other/post as the page is looked up by "post" ;
 		            $query  = $wpdb->prepare("SELECT * FROM {$wpdb->posts} WHERE post_name=%s", $searchname);
 		            $found = $wpdb->get_results($query, OBJECT_K);
 		            if( count($found) ) {
