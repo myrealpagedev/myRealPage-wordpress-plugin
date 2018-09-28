@@ -3,7 +3,7 @@
 /**
  * Plugin Name: myRealPage IDX Listings
  * Description: Embeds myRealPage IDX and Listings solution into WordPress. Uses shortcodes. Create a post or page and use integrated shortcode button to launch myRealPage Listings Shortcode Wizard and generate a shortcode based on your choice of listing content, as well as functional and visual preferences.
- * Version: 0.9.33
+ * Version: 0.9.34
  * Author: myRealPage (support@myrealpage.com)
  * Author URI: http://myrealpage.com
  **/
@@ -583,6 +583,14 @@ if (!class_exists('MRPListing')) {
             $page_by_slug = get_page_by_path( $pagename, OBJECT, 'page' );
             if( !$page_by_slug ) {
 	            $page_by_slug = get_page_by_path( $pagename, OBJECT, 'post' );
+	            if( !$page_by_slug ) {
+		            $query  = $wpdb->prepare("SELECT * FROM {$wpdb->posts} WHERE post_name=%s", $searchname);
+		            $found = $wpdb->get_results($query, OBJECT_K);
+		            if( count($found) ) {
+			            $page_by_slug = reset($found);
+			            $this->logger->debug( "found page via direct SQL and : " . $searchname );
+		            }
+	            }
             }
             $this->logger->debug( "page_by_slug: " . print_r( $page_by_slug, true ) );
             //error_log( "page_by_slug: " . print_r( $page_by_slug, true ) );

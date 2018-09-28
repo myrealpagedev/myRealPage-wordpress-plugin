@@ -8,7 +8,7 @@ class InlineClient {
 
 	const SERVER = 'listings.myrealpage.com';
     //const SERVER = 'ec2-beta.myrealpage.com';
-    //const SERVER = '96.49.208.17';
+    //const SERVER = '174.7.235.34';
     const RES_SERVER = \MRPIDX\InlineClient::SERVER;
 
     protected $context;
