@@ -3,7 +3,7 @@
 /**
  * Plugin Name: myRealPage IDX Listings
  * Description: Embeds myRealPage IDX and Listings solution into WordPress. Uses shortcodes. Create a post or page and use integrated shortcode button to launch myRealPage Listings Shortcode Wizard and generate a shortcode based on your choice of listing content, as well as functional and visual preferences.
- * Version: 0.9.34
+ * Version: 0.9.35
  * Author: myRealPage (support@myrealpage.com)
  * Author URI: https://myrealpage.com
  **/
@@ -710,6 +710,17 @@ if (!class_exists('MRPListing')) {
         public function evowAndRecipHandler()
         {
             $requestUri = $_SERVER['REQUEST_URI'];
+                        
+            // do not allow URLs containing /1234.search/ it messes up google indexing
+            if( preg_match( '@^.+/\d+\.search/.*@', $requestUri ) ) {
+            	$redir = preg_replace( '@^(.+)/\d+\.search/(.*)@', '$1/', $requestUri );
+	            error_log( "PREDEF REQUEST URI HIT : " . $requestUri );
+	            error_log( "PREDEF REQUEST REDIRECT : " . $redir );
+	            header("HTTP/1.1 301 Moved Permanently");
+	            header('Location: ' . $redir );
+                die();
+
+            }
 
             // issue a redirect if we're seeing /wps/evow/ACCOUNT_ID/ExternalView.form?
             if (preg_match('@^/wps/evow/\d+/ExternalView.form?@', $requestUri)) {
