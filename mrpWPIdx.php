@@ -993,6 +993,7 @@ if (!class_exists('MRPListing')) {
 
     $mrp = new MRPListing();
 }
+require 'plugin-update-checker.php';
 $myUpdateChecker = Puc_v4_Factory::buildUpdateChecker(
     'https://raw.githubusercontent.com/myrealpagedev/myRealPage-wordpress-plugin/master/details.json',
     __FILE__, //Full path to the main plugin file or functions.php.
