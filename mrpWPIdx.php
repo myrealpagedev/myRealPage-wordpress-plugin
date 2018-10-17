@@ -714,8 +714,8 @@ if (!class_exists('MRPListing')) {
             // do not allow URLs containing /1234.search/ it messes up google indexing
             if( preg_match( '@^.+/\d+\.search/.*@', $requestUri ) ) {
             	$redir = preg_replace( '@^(.+)/\d+\.search/(.*)@', '$1/', $requestUri );
-	            error_log( "PREDEF REQUEST URI HIT : " . $requestUri );
-	            error_log( "PREDEF REQUEST REDIRECT : " . $redir );
+	            //error_log( "PREDEF REQUEST URI HIT : " . $requestUri );
+	            //error_log( "PREDEF REQUEST REDIRECT : " . $redir );
 	            header("HTTP/1.1 301 Moved Permanently");
 	            header('Location: ' . $redir );
                 die();
