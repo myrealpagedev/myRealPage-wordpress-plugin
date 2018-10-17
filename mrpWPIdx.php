@@ -993,6 +993,9 @@ if (!class_exists('MRPListing')) {
 
     $mrp = new MRPListing();
 }
+// ---------------------------------------------------------------------
+// ---------------------- production specific --------------------------
+// ---------------------------------------------------------------------
 require 'plugin-update-checker.php';
 $myUpdateChecker = Puc_v4_Factory::buildUpdateChecker(
     'https://raw.githubusercontent.com/myrealpagedev/myRealPage-wordpress-plugin/master/details.json',
