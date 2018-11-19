@@ -28,41 +28,7 @@ Your account may have some missing parts. Please contact myRealPage at support@m
 
 You may have accidentally deactivated your myRealPage IDX Listings plugin. Please make sure it is active and updated.
 
-Changelog
 
-= 0.9.28 =
-
-special support for Yoast SEO compatibility and meta "description" tags.
-= 0.9.27 =
-
-Quick fix for individual property pages
-= 0.9.20 =
-
-Added new classes for better styling support
-= 0.9.19 =
-
-Minor Bug fixes
-= 0.9.18 =
-
-Minor Bug fixes
-= 0.9.17 =
-
-Fixed a significant bug that may have broken pages on some themes
-= 0.9.16 =
-
-Minor Bug fixes
-= 0.9.15 = *Support For SSL
-
-= 0.9.13 =
-
-Minor Bug fixes
-= 0.9.12 =
-
-Bug fixes
-= 0.9.10 =
-
-The final push to responsive listings.
-Other Notes
 
 This is a free plugin which requires you to obtain a paid subscription from myRealPage
 
