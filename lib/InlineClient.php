@@ -33,6 +33,12 @@ class InlineClient {
             //"X-MRP-Server-Debug: true",
             "Cookie: " . $this->getCookieHeader()
         );
+        
+        if( isset( $_SERVER["HTTP_X_MRP_AUTO_SOLD"] ) ) {
+	        $this->headers += array(
+	        	"X-MRP-AUTO-SOLD: " . $_SERVER["HTTP_X_MRP_AUTO_SOLD"]
+	        );
+        }
 
         // figure out our extension
         $extension = $context->get("extension");

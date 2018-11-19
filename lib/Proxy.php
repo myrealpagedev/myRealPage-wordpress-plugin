@@ -159,6 +159,9 @@ $content = str_replace(
 	        // X-Requested-With: XMLHttpRequest (normally)
 	        $headers[] = 'X-MRP-CACHE: ' . $_SERVER['HTTP_X_MRP_CACHE'];
         }
+        if( isset( $_SERVER["HTTP_X_MRP_AUTO_SOLD"] ) ) {
+	        $headers[] = "X-MRP-AUTO-SOLD: " . $_SERVER["HTTP_X_MRP_AUTO_SOLD"];
+        }
         
         if ($this->getCookieAsHeader()) {
             $headers[] = $this->getCookieAsHeader();
