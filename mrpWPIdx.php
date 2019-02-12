@@ -3,7 +3,7 @@
 /**
  * Plugin Name: myRealPage IDX Listings
  * Description: Embeds myRealPage IDX and Listings solution into WordPress. Uses shortcodes. Create a post or page and use integrated shortcode button to launch myRealPage Listings Shortcode Wizard and generate a shortcode based on your choice of listing content, as well as functional and visual preferences.
- * Version: 0.9.37
+ * Version: 0.9.40
  * Author: myRealPage (support@myrealpage.com)
  * Author URI: https://myrealpage.com
  **/
@@ -450,6 +450,7 @@ if (!class_exists('MRPListing')) {
                 
                 //error_log( "ATTS: " . print_r( $attrs, true ) );
                 if( isset($attrs["searchform_def"]) && $attrs["searchform_def"] != "" && 
+                	$attrs["searchform_def"] != "idx.browse" && 
                 	( !isset($attrs["extension"]) || $attrs["extension"] == "" )) {	
 	                // no remote call on search form IDX              	
 	              	return;  
@@ -500,6 +501,7 @@ if (!class_exists('MRPListing')) {
         	global $wp_query;
         	$ext = $this->getExtension($wp_query);
             if (isset($attrs["searchform_def"]) && $attrs["searchform_def"] != "" && 
+            		$attrs["searchform_def"] != "idx.browse" &&
                 	( !isset($ext) || $ext == "" )) {
                 // create a client for operating within the new (local) context
                 //$client = new \MRPIDX\InlineClient($this->logger, new \MRPIDX\Context($attrs));
@@ -734,7 +736,9 @@ if (!class_exists('MRPListing')) {
             // issue a redirect if we are seeing /wps/recip/XX/idx.search 
             // this may happen if a vow search is loaded for editing
             // Also: only GET check, because 'POST' is used for actual searching
-            if ( $_SERVER['REQUEST_METHOD'] == 'GET' && preg_match('@^/wps/recip/\d+/(.+.search|search.form)@i', $requestUri)) {
+            if ( $_SERVER['REQUEST_METHOD'] == 'GET' && preg_match('@^/wps/recip/\d+/(.+.search|search.form)@i', $requestUri) &&
+            	!preg_match('@^/wps/recip/\d+/idx.browse@i', $requestUri) ) {
+
                 preg_match('@^/wps/recip/(.*)@', $requestUri, $matches);
                 if (isset($matches[1])) {
                 	//header("HTTP/1.1 301 Moved Permanently");
@@ -745,8 +749,9 @@ if (!class_exists('MRPListing')) {
             
             // empty '/recip-xxx' or /recip-xxx/ -> redirect to /recip-xxx/idx.search
             if( preg_match( '@^/recip\-(\d+)[/]{0,1}$@', $requestUri, $matches ) ) {
-	                header('Location: /recip-' . $matches[1] . "/idx.search" );
-                    die();
+	            //error_log( "----------- HITT 000" );
+	            header('Location: /recip-' . $matches[1] . "/idx.search/" );
+                die();
             }
             
             if (preg_match('@^/evow-\d+@', $requestUri)) {
@@ -764,9 +769,31 @@ if (!class_exists('MRPListing')) {
                 }
             }
             
-            if (preg_match('@^/recip-\d+@', $requestUri)) {
+            if( preg_match('@^/recip-(\d+)/idx\.browse[/]{0,1}@', $requestUri, $matches) ) {
+	            
+	            //error_log( "--------------- HITT BROWSE" );
+	            require_once('fakepage.php');
+                $slug = substr($requestUri, 1);
+                if (stripos($requestUri, '/?')) {
+                    $slug = substr($slug, 0, stripos($requestUri, '/?') );
+                }
+                if (stripos($requestUri, '?')) {
+                    $slug = substr($slug, 0, stripos($requestUri, '?') );
+                }
+				if (isset($matches[1])) {
+                    // generate shortcode for fake page
+                    new FakePage($slug, '  ', '[mrp context=recip account_id=' . $matches[1] . ' searchform_def=idx.browse]');
+                } else {
+                    new FakePage($slug, '  ', '<p>Malformed URL (no account ID given)</p>');
+                }
+            }
+            else if (preg_match('@^/recip-\d+@', $requestUri)) {
+	            //error_log( "--------------- HITT" );
                 require_once('fakepage.php');
                 $slug = substr($requestUri, 1);
+                if (stripos($requestUri, '/?')) {
+                    $slug = substr($slug, 0, stripos($requestUri, '/?') );
+                }
                 if (stripos($requestUri, '?')) {
                     $slug = substr($slug, 0, stripos($requestUri, '?') );
                 }
@@ -793,6 +820,8 @@ if (!class_exists('MRPListing')) {
             if (!preg_match('/^(\/wps\/|\/mrp\-js\-listings\/|\/gmform15\/|\/recip\-[0-9]+\/idx\.search)/', $requestUri)) {
                 return;
             }
+            
+            //error_log( "INLINE ROOT IN PROXY: " . $_SERVER['HTTP_MRPINLINEROOT'] );
 
 
 			$context = new \MRPIDX\Context(

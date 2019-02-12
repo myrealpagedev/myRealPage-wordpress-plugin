@@ -45,13 +45,24 @@ class Logger
         $levels = array();
         if (isset($filters["level"])) {
             // specific level
-            $levels = array(mysql_real_escape_string($filters["level"]));
+            if( function_exists("mysqli_real_escape_string") ) {
+	            $levels = array(mysqli_real_escape_string($filters["level"]));
+            }
+            else {
+	            $levels = array(mysql_real_escape_string($filters["level"]));
+            }
+            
         } elseif (isset($filters["levels"])) {
             // list of levels
-            $levels = array_map("mysql_real_escape_string", $filters["levels"]);
+            if( function_exists("mysqli_real_escape_string") ) {
+            	$levels = array_map("mysqli_real_escape_string", $filters["levels"]);
+            }
+            else {
+	            $levels = array_map("mysql_real_escape_string", $filters["levels"]);
+            }
         }
 
-        $since = isset($filters["since"]) ? mysql_real_escape_string($filters["since"]) : "2000-01-01 00:00:00";
+        $since = isset($filters["since"]) ? mysqli_real_escape_string($filters["since"]) : "2000-01-01 00:00:00";
         $limit = intval($limit);
         $limit = $limit > 0 ? $limit : 100;
         if (count($levels)) {
