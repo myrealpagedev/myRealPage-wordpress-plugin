@@ -30,6 +30,7 @@ class InlineClient {
             "X-WordPress-Referer: " . ( isset( $_SERVER["HTTP_REFERER"] ) ? $_SERVER["HTTP_REFERER"] : "" ),
             "X-WordPress-Theme: " . get_template(),
             "X-MRP-TMPL: v2",
+            "X-Real-IP: " . ( isset( $_SERVER["REMOTE_ADDR"] ) ? $_SERVER["REMOTE_ADDR"] : "-" ),
             //"X-MRP-Server-Debug: true",
             "Cookie: " . $this->getCookieHeader()
         );
@@ -105,6 +106,7 @@ class InlineClient {
         // add MrpInlineRoot header
         $pageName = $this->context->getPageName();
         if (strlen($pageName)) {
+	        //error_log( '------- PAGE NAME: ' . $pageName );
             $client->setHeader("MrpInlineRoot", "/" . $pageName . "/");
         } else {
             $client->setHeader("MrpInlineRoot", "/");
@@ -415,6 +417,8 @@ class InlineClient {
         $url .= '/' . $context->get("accountId");
         $url .= '/';
         $url  = 'http://' . preg_replace('/(\/+)/', '/', $url);
+        
+        $isIDXBrowse = false;
 
         if ($context->has("extension") && $context->get("extension") != "/evow") {
             $url .= $context->get("extension");
@@ -431,21 +435,35 @@ class InlineClient {
         } elseif ($context->has("searchformDef")) {
             // numeric (integer) and non-numeric search forms are handled differently
             $searchformDef = $context->get("searchformDef");
-            if (ctype_digit($searchformDef)) {
-                $url .= $searchformDef . ".searchform";
-            } else {
-                $url .= "Search.form?_sf_=" . $searchformDef;
+            if( $searchformDef == "idx.browse" ) {
+	            $url .= "idx.browse";
+	            $isIDXBrowse = true;
             }
-        }
-
-        $initAttr = trim($context->get("initAttr"));
-        if (!$context->get("extension") && strlen($initAttr) && stripos($url, "?") == false) {
-            $query = preg_replace('/~/', '=', $initAttr);
-            $query = preg_replace('/,/', '&', $query);
-            $url .= '?' . $query;
+            else {
+	            if (ctype_digit($searchformDef)) {
+	                $url .= $searchformDef . ".searchform";
+	            } else {
+	                $url .= "Search.form?_sf_=" . $searchformDef;
+	            }
+            }
         }
         
         $inqueryString = $_SERVER['QUERY_STRING'];
+        
+        if( $isIDXBrowse && $inqueryString ) {
+	        ; // do nothing; no initAttr
+        }
+        else {
+	        $initAttr = trim($context->get("initAttr"));
+	        if (!$context->get("extension") && strlen($initAttr) && stripos($url, "?") == false) {
+	            $query = preg_replace('/~/', '=', $initAttr);
+	            $query = preg_replace('/,/', '&', $query);
+	            $url .= '?' . $query;
+	        }
+        }
+
+        
+        
         if( $inqueryString ) {
 	        if( stripos( $url, '?' ) ) {
 		        $url .= '&' . $inqueryString;

@@ -27,8 +27,13 @@ class Proxy {
         $this->defaultHeaders = array(
             'X-WordPress-Site: ' . ( isset( $_SERVER['HTTP_HOST'] ) ? $_SERVER['HTTP_HOST'] : '' ),
             'X-WordPress-Referer: ' . ( isset($_SERVER['HTTP_REFERER'] ) ? $_SERVER['HTTP_REFERER'] : '' ),
+            "X-Real-IP: " . ( isset( $_SERVER["REMOTE_ADDR"] ) ? $_SERVER["REMOTE_ADDR"] : "-" ),
             "X-WordPress-Theme: " . get_template()
         );
+        //error_log( 'PROXY MRP INLINE ROOT: ' . $_SERVER['HTTP_MRPINLINEROOT'] );
+        if( isset( $_SERVER['HTTP_MRPINLINEROOT'] ) ) {
+	        $this->defaultHeaders[] = 'MrpInlineRoot: ' . $_SERVER['HTTP_MRPINLINEROOT'];
+        }
     }
     
     private function isSecure() {
@@ -136,7 +141,7 @@ $content = str_replace(
         $client  = new Client($uri);
         $headers = $this->defaultHeaders;
 
-        if ($context->getPageName()) {
+        if ($context->getPageName() && !isset($headers['MrpInlineRoot'])) {
             $headers[] = 'MrpInlineRoot: ' . '/' . $context->getPageName();
         }
 
