@@ -34,6 +34,9 @@ class Proxy {
         if( isset( $_SERVER['HTTP_MRPINLINEROOT'] ) ) {
 	        $this->defaultHeaders[] = 'MrpInlineRoot: ' . $_SERVER['HTTP_MRPINLINEROOT'];
         }
+        if( isset( $_SERVER['HTTP_X_MRP_INPAGE_NAV'] ) ) {
+	        $this->defaultHeaders[] = 'X-MRP-INPAGE-NAV: ' . $_SERVER['HTTP_X_MRP_INPAGE_NAV'];
+        }
     }
     
     private function isSecure() {
@@ -167,6 +170,10 @@ $content = str_replace(
         if( isset( $_SERVER["HTTP_X_MRP_AUTO_SOLD"] ) ) {
 	        $headers[] = "X-MRP-AUTO-SOLD: " . $_SERVER["HTTP_X_MRP_AUTO_SOLD"];
         }
+        if( isset( $_SERVER['HTTP_X_MRP_INPAGE_NAV'] ) ) {
+	        $headers[] = 'X-MRP-INPAGE-NAV: ' . $_SERVER['HTTP_X_MRP_INPAGE_NAV'];
+        }
+
         
         if ($this->getCookieAsHeader()) {
             $headers[] = $this->getCookieAsHeader();

@@ -3,7 +3,7 @@
 /**
  * Plugin Name: myRealPage IDX Listings
  * Description: Embeds myRealPage IDX and Listings solution into WordPress. Uses shortcodes. Create a post or page and use integrated shortcode button to launch myRealPage Listings Shortcode Wizard and generate a shortcode based on your choice of listing content, as well as functional and visual preferences.
- * Version: 0.9.40
+ * Version: 0.9.41
  * Author: myRealPage (support@myrealpage.com)
  * Author URI: https://myrealpage.com
  **/
@@ -570,9 +570,22 @@ if (!class_exists('MRPListing')) {
             
             // in case we get a subpage, i.e. something/somewhere as $pagename, use the last segment
             if( strripos( "$pagename", '/' ) ) {
+
 	            $searchname = substr( $pagename, strripos( "$pagename", '/' ) + 1 );
 	            //error_log( "SEARCHNAME: ". $searchname );
-            }
+
+	            // ensure we don't have false nested URLs, like '/foo/listings/listings/listings/listing-details.xyz
+				if( preg_match( "@($searchname\/){1,}@", $pagename . '/', $matches ) ) {
+					// if we matched $matches[0] != $matches[1], i.e. listings/listings != listings
+					// do a replace and redirect
+					if( $matches[0] != $matches[1] ) {
+						$redir = str_replace( $matches[0], $matches[1], $uri );
+						error_log( 'REDIRECTING URL WITH BAD NESTING: ' . $uri );
+						header( 'Location: ' . $redir );
+						die();
+					}
+				}
+			}
             
             // find the page, based on page name
             //$query  = $wpdb->prepare("SELECT * FROM {$wpdb->posts} WHERE post_name=%s", $searchname);
