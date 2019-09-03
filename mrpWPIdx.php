@@ -3,7 +3,7 @@
 /**
  * Plugin Name: myRealPage IDX Listings
  * Description: Embeds myRealPage IDX and Listings solution into WordPress. Uses shortcodes. Create a post or page and use integrated shortcode button to launch myRealPage Listings Shortcode Wizard and generate a shortcode based on your choice of listing content, as well as functional and visual preferences.
- * Version: 0.9.42
+ * Version: 0.9.43
  * Author: myRealPage (support@myrealpage.com)
  * Author URI: https://myrealpage.com
  **/
@@ -218,7 +218,7 @@ if (!class_exists('MRPListing')) {
 
         public function addMenu()
         {
-            add_options_page('mrpWPIdx', 'myRealPage Plugin', 8, __FILE__, array(&$this, 'optionsPage'));
+            add_options_page('mrpWPIdx', 'myRealPage Plugin', 'manage_options', __FILE__, array(&$this, 'optionsPage'));
         }
 
         /**
@@ -988,6 +988,7 @@ if (!class_exists('MRPListing')) {
 			    '\/unibox\.search'               => false,
 			    '\/search\.form'                 => false,
 			    '\/details-[0-9]+'               => false,
+			    '\/mls-[0-9a-zA-Z]+'               => false,
 			    '\/photos-[0-9]+'                => false,
 			    '\/videos-[0-9]+'                => false,
 			    '\/floor-plans-[0-9]+'           => false,
@@ -1002,7 +1003,7 @@ if (!class_exists('MRPListing')) {
 			    '\/gmform15\/(js|dist|font)\/.*' => true
 			);
             // regex for URL patterns where we do title replacement
-            $config["replaceable_titles"] = '@.*/(listing\..+|details\-|photos\-|videos\-|map\-|walkscore\-|'
+            $config["replaceable_titles"] = '@.*/(listing\..+|details\-|mls\-|photos\-|videos\-|map\-|walkscore\-|'
                 . 'print\-|ListingPrint\.form|ListingWalkScore\.form|'
                 . 'ListingVideos\.form|ListingPhotos\.form|'
                 . 'ListingDetails\.form|ListingGoogleMap\.form|'
