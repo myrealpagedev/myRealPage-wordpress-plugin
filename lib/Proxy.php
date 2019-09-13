@@ -143,8 +143,15 @@ $content = str_replace(
         $context = $this->context;
         $client  = new Client($uri);
         $headers = $this->defaultHeaders;
-
-        if ($context->getPageName() && !isset($headers['MrpInlineRoot'])) {
+	
+		$hasInlineRoot = false;
+		foreach($headers as &$header) {
+			if( $header && strpos($header,'MrpInlineRoot') == 0 ) {
+				$hasInlineRoot = true;
+				break;
+			}
+		}
+        if ($context->getPageName() && !$hasInlineRoot) {
             $headers[] = 'MrpInlineRoot: ' . '/' . $context->getPageName();
         }
 
