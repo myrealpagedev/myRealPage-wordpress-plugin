@@ -3,7 +3,7 @@
 /**
  * Plugin Name: myRealPage IDX Listings
  * Description: Embeds myRealPage IDX and Listings solution into WordPress. Uses shortcodes. Create a post or page and use integrated shortcode button to launch myRealPage Listings Shortcode Wizard and generate a shortcode based on your choice of listing content, as well as functional and visual preferences.
- * Version: 0.9.44
+ * Version: 0.9.45
  * Author: myRealPage (support@myrealpage.com)
  * Author URI: https://myrealpage.com
  **/
@@ -320,8 +320,8 @@ if (!class_exists('MRPListing')) {
         * Yoast filter
         **/
         public function changeYoastDescription($desc) {
-	        if( $regex != "" && preg_match($regex, $_SERVER['REQUEST_URI']) && isset($this->mrpData["title"]) ) {
-            	return false;
+	        if( isset($this->mrpData["title"]) ) {
+            	return $this->mrpData["title"];
             }
             return $desc;
         }
@@ -722,8 +722,25 @@ if (!class_exists('MRPListing')) {
                 if ($regex && preg_match("/$regex/i", $url)) {
                 	$this->debug( "Matched managed URL expression: ". $regex );
                 	//error_log( "Matched managed URL expression: ". $regex );
+                	
+		            // check that exactly this page exists and has a shortcode
+		            // e.g. /mls-search/ may be confused with /mls-R786555/ managed URL
+		            $urlpathonly = strtok($url,'?');
+		            //error_log( "URL PATH: " . $urlpathonly );
+		            $page_by_slug = get_page_by_path( $urlpathonly, OBJECT, 'page' );
+		            //error_log( 'LOOKED UP SLUG DOUBLE CHECKING MANAGED URL: ' . print_r( $page_by_slug, true ) );
+		            if( !$page_by_slug ) {
+			            $page_by_slug = get_page_by_path( $urlpathonly, OBJECT, 'post' );
+			            //error_log( 'LOOKED UP SLUG 2 LOOKED UP SLUG DOUBLE CHECKING MANAGED URL: ' . print_r( $page_by_slug, true ) );
+			            if( !$page_by_slug ) {
+							return true;
+						}
+					}
 
-                    return true;
+					if ( isset($page_by_slug) /* && has_shortcode($page_by_slug->post_content, 'mrp') */) {
+						//error_log( "BAILING FROM SEEMINGLY MANAGED URL WHICH EXISTS AS PAGE / POST: " . $urlpath );
+						return false; // we thought we were managed URL; but a real page exists with shortcode
+					}	
                 }
             }
             return false;
