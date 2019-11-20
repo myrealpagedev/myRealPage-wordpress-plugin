@@ -3,7 +3,7 @@
 /**
  * Plugin Name: myRealPage IDX Listings
  * Description: Embeds myRealPage IDX and Listings solution into WordPress. Uses shortcodes. Create a post or page and use integrated shortcode button to launch myRealPage Listings Shortcode Wizard and generate a shortcode based on your choice of listing content, as well as functional and visual preferences.
- * Version: 0.9.48
+ * Version: 0.9.48-dev
  * Author: myRealPage (support@myrealpage.com)
  * Author URI: https://myrealpage.com
  **/
@@ -202,6 +202,33 @@ if (!class_exists('MRPListing')) {
             
             add_action( "admin_enqueue_scripts", array(&$this,"adminScripts" ));
             
+            add_filter( 'block_categories', array(&$this,"createMrpBlockCategory" ), 10, 2);
+            add_action('enqueue_block_editor_assets', array(&$this, 'loadMrpBlock'));
+        
+        }
+
+        function createMrpBlockCategory( $categories, $post ) {
+            return array_merge(
+                $categories,
+                array(
+                    array(
+                        'slug' => 'mrp-blocks',
+                        'title' => __( 'myRealPage Blocks', 'mrp-blocks' ),
+                    ),
+                )
+            );
+        }
+
+        public function loadMrpBlock() {
+
+            do_action( 'php_console_log', '====================================================================' );
+            wp_enqueue_script(
+              'mrp-test-block',
+              plugin_dir_url(__FILE__) . 'mrp-block/dist/blocks.build.js',
+              array('wp-blocks','wp-editor'),
+              true
+            );
+
         }
         
         public function adminScripts() {
