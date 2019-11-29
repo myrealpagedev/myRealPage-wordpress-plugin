@@ -199,15 +199,14 @@ if (!class_exists('MRPListing')) {
             add_action('admin_print_scripts', array(&$this, 'loadAdminScripts'));
             // any tasks that ought to be run in the background (hourly)
             add_action("mrpidx_hourly_event_hook", array(&$this, "performHourlyTasks"));
-
             add_action( "admin_enqueue_scripts", array(&$this,"adminScripts" ));
 
-			// https://developer.wordpress.org/block-editor/developers/filters/block-filters/#managing-block-categories
-			add_filter( 'block_categories', array(&$this,"createMrpBlocksCategory" ), 10, 2);
-			add_action( 'enqueue_block_editor_assets', array(&$this,"loadMrpBlocks" ));
-
-			require_once plugin_dir_path( __FILE__ ) . 'mrp-blocks/plugin.php';
-        }
+			// Gutenberg Support
+			if ( function_exists( 'register_block_type' ) ) {
+				add_filter( 'block_categories', array(&$this,"createMrpBlocksCategory" ), 10, 2);
+				require_once plugin_dir_path( __FILE__ ) . './mrp-blocks/src/init.php';
+			}
+		}
 
         function createMrpBlocksCategory( $categories, $post ) {
             return array_merge(

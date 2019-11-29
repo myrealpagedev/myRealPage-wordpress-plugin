@@ -15,3 +15,6 @@ function mrp_dynamic_block_register() {
 
 
 add_action( 'init', 'mrp_dynamic_block_register' );
+
+
+?>

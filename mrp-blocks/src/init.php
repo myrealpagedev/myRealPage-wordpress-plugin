@@ -86,11 +86,16 @@ function mrp_block_cgb_block_assets() { // phpcs:ignore
 		)
 	);
 
+
 }
 
-// Dynamic blocks!
-require_once plugin_dir_path( __FILE__ ) . 'blocks/dynamic/block.php';
+include_once plugin_dir_path( __FILE__ ) . './blocks/dynamic/block.php';
 
-// Hook: Block assets.
+
+// Dynamic blocks!
+
 // add_action( 'init', 'mrp_block_cgb_block_assets' );
 add_action( 'enqueue_block_editor_assets', 'mrp_block_cgb_block_assets' );
+
+
+?>
