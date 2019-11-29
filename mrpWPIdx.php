@@ -219,11 +219,6 @@ if (!class_exists('MRPListing')) {
             );
         }
 
-        public function dynamic_render_callback( $attributes, $content ) {
-            return sprintf(
-                '<div>Hello</div>');
-        }
-
         public function adminScripts() {
 	        wp_register_script('mrp-sc-editor', plugins_url('mrp_sc_editor.js?v1', __FILE__), array('jquery'), '1.0.12');
         }
