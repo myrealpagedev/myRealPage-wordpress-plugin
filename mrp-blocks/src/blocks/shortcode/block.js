@@ -82,6 +82,8 @@ registerBlockType( 'cgb/mrp-shortcode-block', {
 		function mrpOpenSC() {
 			let privateOfficeUrl = 'https://private-office.myrealpage.com/wps/rest/auth/sc';
 
+			privateOfficeUrl = 'https://ec2-beta.myrealpage.com/wps/rest/auth/sc';
+
 			if ( window.location.href.startsWith( 'http://192.' ) || window.location.href.startsWith( 'http://localhost' ) ) {
 				privateOfficeUrl = 'http://localhost:8080/wps/rest/auth/sc';
 			}
