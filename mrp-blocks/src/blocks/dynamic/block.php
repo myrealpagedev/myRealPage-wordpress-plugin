@@ -2,9 +2,7 @@
 
 function mrp_cgb__render_block( $attributes, $content ) {
 	return sprintf(
-	  '<div class="%s">DYNAMIC!
-		[mrp account_id=1206 searchform_def=idx.browse embed=true context=recip]
-	  </div>',
+	  '<div class="%s">Dynamic</div>',
 	  'wp-block-cgb-mrp-dynamic-block');
   }
 
