@@ -56,6 +56,7 @@ registerBlockType( 'cgb/mrp-shortcode-block', {
 	 */
 	edit: props => {
 		let shortcode = '';
+		let incomingShortcode = null;
 
 		if ( props.attributes.content ) {
 			shortcode = props.attributes.content;
@@ -103,13 +104,16 @@ registerBlockType( 'cgb/mrp-shortcode-block', {
 
 			if ( typeof event.data === 'string' || event.data instanceof String ) {
 				if ( event.data && event.data.startsWith( '[mrp' ) ) {
-					shortcode = event.data;
+					incomingShortcode = event.data;
 				}
 			}
 		}
 
 		window.setInterval( () => {
-			updateContent( shortcode );
+			if ( incomingShortcode ) {
+				updateContent( incomingShortcode );
+				incomingShortcode = null;
+			}
 		}, 1000 );
 
 		return (
