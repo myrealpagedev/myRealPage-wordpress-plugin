@@ -82,9 +82,13 @@ function mrp_block_cgb_block_assets() { // phpcs:ignore
 			'editor_script' => 'mrp_block-cgb-block-js',
 			// Enqueue blocks.editor.build.css in the editor only.
 			'editor_style'  => 'mrp_block-cgb-block-editor-css',
+			'render_callback' => 'mrp_cgb__render_block',
 		)
 	);
 }
+
+// Dynamic blocks!
+require_once plugin_dir_path( __FILE__ ) . 'blocks/dynamic/block.php';
 
 // Hook: Block assets.
 add_action( 'init', 'mrp_block_cgb_block_assets' );

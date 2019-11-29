@@ -1,11 +1,9 @@
 
-Goals:
- - 
+# Building
 
-Questions:
- - How do we push updates?
- - 
-
+``` sh
+make build
+```
 
 Research:
  - https://github.com/ahmadawais/create-guten-block

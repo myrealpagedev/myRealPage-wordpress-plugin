@@ -6,7 +6,7 @@
 
 //
 
-import Icon from './icon.js';
+import Icon from '../../components/icon.js';
 import { Button } from '@wordpress/components';
 
 //  Import CSS.
@@ -31,28 +31,7 @@ const { registerBlockType } = wp.blocks; // Import registerBlockType() from wp.b
  *                             registered; otherwise `undefined`.
  */
 
-function mrpSCOptimalHeight() {
-	let h = 500;
-	if ( window.screen.availHeight > 600 ) {
-		h = 700;
-	}
-	if ( window.screen.availHeight > 800 ) {
-		h = 800;
-	}
-	return h;
-}
-
-function mrpOpenSC() {
-	const win = window.open( 'https://private-office.myrealpage.com/wps/rest/auth/sc', 'mrp_shorcodes_wizard', 'scrollbars=1,width=800,height=' + mrpSCOptimalHeight() );
-	if ( ! win ) {
-		alert( 'It appears, you have blocked popups. Please allow popups for this page in order to open the Shortcode Wizard.' );
-	} else {
-		win.focus();
-	}
-	return false;
-}
-
-registerBlockType( 'cgb/block-mrp-block', {
+registerBlockType( 'cgb/mrp-shortcode-block', {
 	// Block name. Block names must be string that contains a namespace prefix. Example: my-plugin/my-custom-block.
 	title: __( 'myRealPage - Shortcode' ), // Block title.
 	icon: Icon, // Block icon from Dashicons → https://developer.wordpress.org/resource/dashicons/.
@@ -76,9 +55,63 @@ registerBlockType( 'cgb/block-mrp-block', {
 	 * @returns {Mixed} JSX Component.
 	 */
 	edit: props => {
-		function updateContent( data ) {
-			props.setAttributes( { content: data } );
+		let shortcode = '';
+
+		if ( props.attributes.content ) {
+			shortcode = props.attributes.content;
 		}
+
+		function updateContent( data ) {
+			if ( data != props.attributes.content ) {
+				props.setAttributes( { content: data } );
+			}
+		}
+
+		function mrpSCOptimalHeight() {
+			let h = 500;
+			if ( window.screen.availHeight > 600 ) {
+				h = 700;
+			}
+			if ( window.screen.availHeight > 800 ) {
+				h = 800;
+			}
+			return h;
+		}
+
+		function mrpOpenSC() {
+			let privateOfficeUrl = 'https://private-office.myrealpage.com/wps/rest/auth/sc';
+
+			if ( window.location.href.startsWith( 'http://192.' ) || window.location.href.startsWith( 'http://localhost' ) ) {
+				privateOfficeUrl = 'http://localhost:8080/wps/rest/auth/sc';
+			}
+
+			const win = window.open( privateOfficeUrl, 'mrp_shorcodes_wizard', 'scrollbars=1,width=800,height=' + mrpSCOptimalHeight() );
+			if ( ! win ) {
+				alert( 'It appears, you have blocked popups. Please allow popups for this page in order to open the Shortcode Wizard.' );
+			} else {
+				win.focus();
+			}
+			return false;
+		}
+
+		window.addEventListener( 'message', receiveMessage, false );
+
+		function receiveMessage( event ) {
+			if ( ! event.data ) {
+				return;
+			}
+
+			if ( typeof event.data === 'string' || event.data instanceof String ) {
+				if ( event.data && event.data.startsWith( '[mrp' ) ) {
+					shortcode = event.data;
+				}
+			}
+		}
+
+		window.setInterval( () => {
+			updateContent( shortcode );
+		}, 1000 );
+
 		return (
 			<div className={ props.className }>
 				<Button isDefault onClick={ mrpOpenSC }>
@@ -87,7 +120,7 @@ registerBlockType( 'cgb/block-mrp-block', {
 				<br />
 				<b>Shorcode:</b>
 				<br />
-				<textarea rows="4" cols="50" onChange={ ( event ) => updateContent( event.target.value ) } value={ props.attributes.content } />
+				<textarea rows="4" cols="50" onChange={ ( event ) => updateContent( event.target.value ) } value={ shortcode } />
 			</div>
 		);
 	},
@@ -103,12 +136,17 @@ registerBlockType( 'cgb/block-mrp-block', {
 	 * @param {Object} props Props.
 	 * @returns {Mixed} JSX Frontend HTML.
 	 */
-	save: () => {
-		return null;
+	// save: () => {
+	// 	return null;
+	// },
+	save: props => {
+		return (
+			<RawHTML>{ props.attributes.content }</RawHTML>
+		);
 	},
 	// save: props => {
 	// 	return (
-	// 		<div className={ props.className }><RawHTML>{ props.attributes.content }</RawHTML></div>
+	// 		<div><RawHTML>{ props.attributes.content }</RawHTML>123</div>
 	// 	);
 	// },
 } );
