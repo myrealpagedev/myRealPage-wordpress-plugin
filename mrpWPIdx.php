@@ -202,12 +202,14 @@ if (!class_exists('MRPListing')) {
 
             add_action( "admin_enqueue_scripts", array(&$this,"adminScripts" ));
 
-            add_filter( 'block_categories', array(&$this,"createMrpBlockCategory" ), 10, 2);
-			require_once plugin_dir_path( __FILE__ ) . 'mrp-blocks/plugin.php';
+			// https://developer.wordpress.org/block-editor/developers/filters/block-filters/#managing-block-categories
+			add_filter( 'block_categories', array(&$this,"createMrpBlocksCategory" ), 10, 2);
+			add_action( 'enqueue_block_editor_assets', array(&$this,"loadMrpBlocks" ));
 
+			require_once plugin_dir_path( __FILE__ ) . 'mrp-blocks/plugin.php';
         }
 
-        function createMrpBlockCategory( $categories, $post ) {
+        function createMrpBlocksCategory( $categories, $post ) {
             return array_merge(
                 $categories,
                 array(
@@ -216,7 +218,7 @@ if (!class_exists('MRPListing')) {
                         'title' => __( 'myRealPage Blocks', 'mrp-blocks' ),
                     ),
                 )
-            );
+			);
         }
 
         public function adminScripts() {

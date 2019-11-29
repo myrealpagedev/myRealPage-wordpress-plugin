@@ -93,4 +93,5 @@ function mrp_block_cgb_block_assets() { // phpcs:ignore
 
 
 // Hook: Block assets.
-add_action( 'init', 'mrp_block_cgb_block_assets' );
+// add_action( 'init', 'mrp_block_cgb_block_assets' );
+add_action( 'enqueue_block_editor_assets', 'mrp_block_cgb_block_assets' );
