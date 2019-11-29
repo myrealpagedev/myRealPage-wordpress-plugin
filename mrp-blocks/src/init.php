@@ -85,10 +85,12 @@ function mrp_block_cgb_block_assets() { // phpcs:ignore
 			'render_callback' => 'mrp_cgb__render_block',
 		)
 	);
+
+
+	// Dynamic blocks!
+	require_once plugin_dir_path( __FILE__ ) . 'blocks/dynamic/block.php';
 }
 
-// Dynamic blocks!
-require_once plugin_dir_path( __FILE__ ) . 'blocks/dynamic/block.php';
 
 // Hook: Block assets.
 add_action( 'init', 'mrp_block_cgb_block_assets' );
