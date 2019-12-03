@@ -331,6 +331,7 @@ class InlineClient {
             	if( $name != "Set-Cookie" && ( $name == "Cache-Control" || $name == "Expires" ) ) {
             		// we process cookies separately, due to there being multiple headers
 					$this->logger->debug("Setting header: " . $name . ": " . $value);
+					//error_log( "Setting header: " . $name . ": " . $value);
 					header($name . ": " . $value, true);
             	}
             }
@@ -353,9 +354,16 @@ class InlineClient {
 	    $cookies = $response->getCookies();
         //$this->logger->debug("Setting cookies: " . print_r($cookies,true) );
         foreach( $cookies as $cookie ) {
-	        //error_log( "COOKIE: " . $cookie );
-	        $this->logger->debug("Setting cookie: " . $cookie );
-	        header( "Set-Cookie:" . $cookie, false );
+			parse_str(strtr($cookie, array('&' => '%26', '+' => '%2B', ';' => '&')), $parsed);
+			if( $parsed['mrp_sort']) {
+				$mod_sorted_cookie = "mrp_sort=" . $parsed["mrp_sort"] . "; Path=" . $_SERVER['REQUEST_URI'];
+				error_log( "SORT COOKIE: " . $mod_sorted_cookie );
+				header( "Set-Cookie:" . $mod_sorted_cookie, false );
+			}
+			else {
+				$this->logger->debug("Setting cookie: " . $cookie );
+				header( "Set-Cookie:" . $cookie, false );
+			}
         }
         //error_log( "COOKIES: " . print_r( $response->getCookies(), true ));
     }
