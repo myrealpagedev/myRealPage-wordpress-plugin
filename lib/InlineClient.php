@@ -356,7 +356,7 @@ class InlineClient {
         foreach( $cookies as $cookie ) {
 			parse_str(strtr($cookie, array('&' => '%26', '+' => '%2B', ';' => '&')), $parsed);
 			if( $parsed['mrp_sort']) {
-				$mod_sorted_cookie = "mrp_sort=" . $parsed["mrp_sort"] . "; Path=" . $_SERVER['REQUEST_URI'];
+				$mod_sorted_cookie = "mrp_sort=" . $parsed["mrp_sort"] . "; Path=/";
 				error_log( "SORT COOKIE: " . $mod_sorted_cookie );
 				header( "Set-Cookie:" . $mod_sorted_cookie, false );
 			}
