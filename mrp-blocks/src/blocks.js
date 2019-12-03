@@ -10,5 +10,5 @@
  */
 
 import './blocks/shortcode/block.js';
-import './blocks/dynamic/block.js';
-import './blocks/helloworld/block.js';
+// import './blocks/dynamic/block.js';
+// import './blocks/helloworld/block.js';
