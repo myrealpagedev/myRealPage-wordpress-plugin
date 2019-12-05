@@ -1,7 +1,8 @@
+default: build
 
 clean:
-	rm mrp-wordpress-plugin.zip
-	rm mrp-blocks/dist
+	rm -f mrp-wordpress-plugin.zip
+	rm -Rf mrp-blocks/dist
 
 development:
 	cd mrp-blocks && \
@@ -11,7 +12,9 @@ compile:
 	cd mrp-blocks && \
 	npm run build
 
+build: clean compile
+
 package:
 	git archive -o mrp-wordpress-plugin.zip -9 HEAD
 
-build: compile package
+

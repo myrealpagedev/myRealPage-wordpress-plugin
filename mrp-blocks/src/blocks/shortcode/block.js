@@ -79,6 +79,12 @@ registerBlockType( 'cgb/mrp-shortcode-block', {
 			return h;
 		}
 
+		function startPing( win ) {
+			window.setInterval( function() {
+				win.postMessage( '[mrp_wordpress_plugin ready]', '*' );
+			}, 1000 );
+		}
+
 		function mrpOpenSC() {
 			let privateOfficeUrl = 'https://private-office.myrealpage.com/wps/rest/auth/sc';
 
@@ -86,12 +92,14 @@ registerBlockType( 'cgb/mrp-shortcode-block', {
 				privateOfficeUrl = 'http://localhost:8080/wps/rest/auth/sc';
 			}
 
-			const win = window.open( privateOfficeUrl, 'mrp_shorcodes_wizard', 'scrollbars=1,width=800,height=' + mrpSCOptimalHeight() );
+			const win = window.open( privateOfficeUrl, 'mrp_shorcodes_wizard', 'scrollbars=1,width=1024,height=' + mrpSCOptimalHeight() );
 			if ( ! win ) {
 				alert( 'It appears, you have blocked popups. Please allow popups for this page in order to open the Shortcode Wizard.' );
 			} else {
 				win.focus();
+				startPing( win );
 			}
+
 			return false;
 		}
 
@@ -124,7 +132,7 @@ registerBlockType( 'cgb/mrp-shortcode-block', {
 				<br />
 				<b>Shorcode:</b>
 				<br />
-				<textarea rows="4" cols="50" onChange={ ( event ) => updateContent( event.target.value ) } value={ shortcode } />
+				<textarea rows="4" cols="50" readOnly={ true } onChange={ ( event ) => updateContent( event.target.value ) } value={ shortcode } />
 			</div>
 		);
 	},
