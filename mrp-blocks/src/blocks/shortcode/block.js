@@ -6,6 +6,8 @@
 
 //
 
+import Cookies from 'js-cookies';
+
 import Icon from '../../components/icon.js';
 import { Button } from '@wordpress/components';
 
@@ -55,11 +57,20 @@ registerBlockType( 'cgb/mrp-shortcode-block', {
 	 * @returns {Mixed} JSX Component.
 	 */
 	edit: props => {
+		let baseURL = 'https://private-office.myrealpage.com';
 		let shortcode = '';
 		let incomingShortcode = null;
+		let pinger = null;
+		let shortcodeListener = null;
+		let popup = null;
 
 		if ( props.attributes.content ) {
 			shortcode = props.attributes.content;
+		}
+
+		// For development
+		if ( window.location.href.startsWith( 'http://192.' ) || window.location.href.startsWith( 'http://localhost' ) ) {
+			baseURL = 'http://localhost:8080';
 		}
 
 		function updateContent( data ) {
@@ -79,25 +90,72 @@ registerBlockType( 'cgb/mrp-shortcode-block', {
 			return h;
 		}
 
-		function startPing( win ) {
-			window.setInterval( function() {
-				win.postMessage( '[mrp_wordpress_plugin ready]', '*' );
+		function startPing() {
+			console.log( 'starting pinger...' );
+			pinger = setInterval( function() {
+				console.log( 'sending ping' );
+				if ( popup.closed ) {
+					stopPing();
+					return;
+				}
+
+				popup.postMessage( '[mwp-ping]', '*' );
 			}, 1000 );
 		}
 
-		function mrpOpenSC() {
-			let privateOfficeUrl = 'https://private-office.myrealpage.com/wps/rest/auth/sc';
+		function stopPing() {
+			console.log( 'stop pinger.' );
+			clearTimeout( pinger );
+			pinger = null;
+		}
 
-			if ( window.location.href.startsWith( 'http://192.' ) || window.location.href.startsWith( 'http://localhost' ) ) {
-				privateOfficeUrl = 'http://localhost:8080/wps/rest/auth/sc';
+		function storeAuthToken( token ) {
+			console.log( 'storing auth token', token );
+			Cookies.setItem( 'mwp-auth', token );
+		}
+
+		function retrieveAuthToken() {
+			console.log( 'retrieving auth token' );
+			return Cookies.getItem( 'mwp-auth' );
+		}
+
+		function startListingForShortcodes() {
+			shortcodeListener = setInterval( () => {
+				console.log( 'listing for shortcodes...' );
+
+				if ( incomingShortcode ) {
+					updateContent( incomingShortcode );
+					incomingShortcode = null;
+				} else if ( popup.closed ) {
+					stopListingForShortcodes();
+				}
+			}, 1000 );
+		}
+
+		function stopListingForShortcodes() {
+			clearInterval( shortcodeListener );
+			shortcodeListener = null;
+		}
+
+		function mrpOpenSC() {
+			let token = retrieveAuthToken();
+
+			let privateOfficeUrl = baseURL;
+
+			if ( token && token.length > 0 ) {
+				token = token.split( '|' );
+				privateOfficeUrl += '/wps/rest/-' + token[ 0 ] + '-/' + token[ 1 ] + '/admin/l/ext/sc/listings';
+			} else {
+				privateOfficeUrl += '/wps/rest/auth/sc';
 			}
 
-			const win = window.open( privateOfficeUrl, 'mrp_shorcodes_wizard', 'scrollbars=1,width=1024,height=' + mrpSCOptimalHeight() );
-			if ( ! win ) {
+			popup = window.open( privateOfficeUrl, 'mrp_shorcodes_wizard', 'scrollbars=1,width=1024,height=' + mrpSCOptimalHeight() );
+			if ( ! popup ) {
 				alert( 'It appears, you have blocked popups. Please allow popups for this page in order to open the Shortcode Wizard.' );
 			} else {
-				win.focus();
-				startPing( win );
+				popup.focus();
+				startPing( popup );
+				startListingForShortcodes();
 			}
 
 			return false;
@@ -111,18 +169,20 @@ registerBlockType( 'cgb/mrp-shortcode-block', {
 			}
 
 			if ( typeof event.data === 'string' || event.data instanceof String ) {
-				if ( event.data && event.data.startsWith( '[mrp' ) ) {
+				if ( event.data && event.data.startsWith( '[mwp-auth' ) ) {
+					let token = event.data;
+					console.log( 'token', token );
+					token = token.substr( token.indexOf( ' ' ) + 1 );
+					console.log( 'token', token );
+					token = token.substr( 0, token.lastIndexOf( ' ' ) );
+					console.log( 'token', token );
+					storeAuthToken( token );
+				} else if ( event.data && event.data.startsWith( '[mrp ' ) ) {
 					incomingShortcode = event.data;
+					console.log( 'incomingShortcode', incomingShortcode );
 				}
 			}
 		}
-
-		window.setInterval( () => {
-			if ( incomingShortcode ) {
-				updateContent( incomingShortcode );
-				incomingShortcode = null;
-			}
-		}, 1000 );
 
 		return (
 			<div className={ props.className }>
@@ -132,7 +192,7 @@ registerBlockType( 'cgb/mrp-shortcode-block', {
 				<br />
 				<b>Shorcode:</b>
 				<br />
-				<textarea rows="4" cols="50" readOnly={ true } onChange={ ( event ) => updateContent( event.target.value ) } value={ shortcode } />
+				<textarea rows="4" cols="50" onChange={ ( event ) => updateContent( event.target.value ) } value={ shortcode } />
 			</div>
 		);
 	},
