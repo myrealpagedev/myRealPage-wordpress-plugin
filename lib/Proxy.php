@@ -46,7 +46,12 @@ class Proxy {
    	public function nocacheHeaders()
     {
         header( "Cache-Control: no-store" );
+        header( "X-MRP-DYNAMIC: " . gmdate("D, d M Y H:i:s") . " GMT" );
         header( "Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT" );
+        
+        // we have to add this cookie to simulate an auth env for hosting envs like WPEngine which look
+        // for wordpress_ cookies to disable cache
+        header( "Set-Cookie: wordpress_mrp_cache=no-store; Path=/wps" );
     }
 
     public function doProxy($uri, $postParams = array())
@@ -137,7 +142,6 @@ $content = str_replace(
         }
 
         if ($cached) {
-        	error_log( "RETURNING CACHED RESOURCE: " . $uri );
             return new HTTP\Response($cached["content"], array());
         }
 
@@ -200,16 +204,8 @@ $content = str_replace(
         $client->makeRequest();
         $response = $client->getResponse();
         // we will set header X-MRP-CACHE for the dynamic forms, retrievable as $_SERVER['HTTP_X_MRP_CACHE'] (note 'HTTP_' prefix and '-' to '_' conversion)
-        
-        $cacheControl = $_SERVER['HTTP_CACHE_CONTROL'];
-        $noCache = ( isset( $cacheControl ) && ( stristr( $cacheControl, "no-cache" ) || stristr( $cacheControl, "no-store" ) ) );
-        $noCache = $noCache || ( isset( $_SERVER['HTTP_X_MRP_CACHE'] ) && "no" == $_SERVER['HTTP_X_MRP_CACHE'] );
-        if ($response && $this->cache->isCacheable($uri) && $noCache ) {
+        if ($response && $this->cache->isCacheable($uri) && 'no' != $_SERVER['HTTP_X_MRP_CACHE'] ) {
             $this->cache->setItem($uri, $response->getRawContent());
-        }
-        else {
-	        error_log( "SKIPPING CACHING FOR: " . $uri . " (" . $noCache . ")  X-MRP-CACHE: " . $_SERVER['HTTP_X_MRP_CACHE'] . 
-	        	" Cache-Control: " . $_SERVER['HTTP_CACHE_CONTROL'] );
         }
         return $response;
     }
