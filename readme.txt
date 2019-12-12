@@ -42,9 +42,6 @@ Support will only be provided for clients of myRealPage with a Wordpress Plugin 
 
 For more information on myRealPage, please visit us myRealPage .
 
-Known Server Conflicts
-
-Our plugin has been known to not function 100% when hosted on the WP-Engine Server.
 Known Plugin Conflicts
 
 SEO Friendly Image
