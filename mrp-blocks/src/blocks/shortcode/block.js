@@ -132,7 +132,7 @@ registerBlockType( 'cgb/mrp-shortcode-block', {
 				<br />
 				<b>Shorcode:</b>
 				<br />
-				<textarea rows="4" cols="50" readOnly={ true } onChange={ ( event ) => updateContent( event.target.value ) } value={ shortcode } />
+				<textarea rows="4" cols="50" onChange={ ( event ) => updateContent( event.target.value ) } value={ shortcode } />
 			</div>
 		);
 	},
