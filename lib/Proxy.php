@@ -45,8 +45,13 @@ class Proxy {
 	
    	public function nocacheHeaders()
     {
-        header( "Cache-Control: no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0" );
+        header( "Cache-Control: no-store" );
+        header( "X-MRP-DYNAMIC: " . gmdate("D, d M Y H:i:s") . " GMT" );
         header( "Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT" );
+        
+        // we have to add this cookie to simulate an auth env for hosting envs like WPEngine which look
+        // for wordpress_ cookies to disable cache
+        header( "Set-Cookie: wordpress_mrp_cache=no-store; Path=/wps" );
     }
 
     public function doProxy($uri, $postParams = array())
@@ -181,6 +186,7 @@ $content = str_replace(
 	        $headers[] = 'X-MRP-INPAGE-NAV: ' . $_SERVER['HTTP_X_MRP_INPAGE_NAV'];
         }
 
+		$headers[] = 'cache-control: no-store';
         
         if ($this->getCookieAsHeader()) {
             $headers[] = $this->getCookieAsHeader();

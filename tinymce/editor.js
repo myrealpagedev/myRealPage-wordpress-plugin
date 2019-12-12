@@ -1,6 +1,20 @@
 (function() {
         // Load plugin specific language pack
-        tinymce.PluginManager.requireLangPack('mrplisting');
+	tinymce.PluginManager.requireLangPack('mrplisting');
+
+	function receiveMessage( event ) {
+		if ( ! event.data ) {
+			return;
+		}
+
+		if ( typeof event.data === 'string' || event.data instanceof String ) {
+			if ( event.data && event.data.startsWith( '[mrp' ) ) {
+				tinymce.activeEditor.execCommand('mceInsertContent', false, event.data);
+			}
+		}
+	}
+
+	window.addEventListener( 'message', receiveMessage, false );
 
         tinymce.create('tinymce.plugins.MRPListing', {
                 /**
@@ -20,7 +34,7 @@
                                 }
                         });
                 },
-                
+
                  /**
                  * Creates control instances based in the incomming name. This method is normally not
                  * needed since the addButton method of the tinymce.Editor class is a more easy way of adding buttons

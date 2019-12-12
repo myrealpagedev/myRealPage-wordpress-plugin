@@ -1,0 +1,48 @@
+version: '3.3'
+
+services:
+  db:
+    image: mysql:5.7
+    volumes:
+      - db_data:/var/lib/mysql
+    restart: always
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: somewordpress
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: wordpress
+
+  wordpress-5:
+    depends_on:
+      - db
+    image: wordpress:5-apache
+    volumes:
+      - .:/var/www/html/wp-content/plugins/myRealPage-wordpress-plugin-dev
+    ports:
+      - "8005:80"
+    restart: always
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_USER: root
+      WORDPRESS_DB_PASSWORD: somewordpress
+      WORDPRESS_DB_NAME: wordpress-5
+
+  wordpress-4:
+    depends_on:
+      - db
+    image: wordpress:4-apache
+    volumes:
+      - .:/var/www/html/wp-content/plugins/myRealPage-wordpress-plugin-dev
+    ports:
+      - "8004:80"
+    restart: always
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_USER: root
+      WORDPRESS_DB_PASSWORD: somewordpress
+      WORDPRESS_DB_NAME: wordpress-4
+
+volumes:
+    db_data: {}
