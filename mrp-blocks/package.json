@@ -9,5 +9,8 @@
   },
   "dependencies": {
     "cgb-scripts": "1.22.0"
+  },
+  "devDependencies": {
+    "mem": ">=4.0.0"
   }
 }
