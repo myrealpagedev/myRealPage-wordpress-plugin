@@ -10,5 +10,8 @@
   "dependencies": {
     "cgb-scripts": "1.22.0",
     "js-cookies": "^1.0.4"
+  },
+  "devDependencies": {
+    "mem": ">=4.0.0"
   }
 }
