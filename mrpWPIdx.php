@@ -9,6 +9,7 @@
  **/
 
 // PHP >= 5.4.x needed
+
 if (PHP_MAJOR_VERSION < 5 || (PHP_MAJOR_VERSION == 5 && PHP_MINOR_VERSION < 4)) {
     die('PHP Version 5.4 or above is required for this plugin.');
 }
@@ -1087,12 +1088,3 @@ if (!class_exists('MRPListing')) {
 
     $mrp = new MRPListing();
 }
-// ---------------------------------------------------------------------
-// ---------------------- production specific --------------------------
-// ---------------------------------------------------------------------
-require 'plugin-update-checker.php';
-$myUpdateChecker = Puc_v4_Factory::buildUpdateChecker(
-    'https://raw.githubusercontent.com/myrealpagedev/myRealPage-wordpress-plugin/master/details.json',
-    __FILE__, //Full path to the main plugin file or functions.php.
-    'myRealPage-wordpress-plugin'
-);
