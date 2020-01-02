@@ -64,6 +64,10 @@ class Proxy {
         
         $response = $this->proxy($uri, $postParams);
         
+        if( $response ) {
+	        error_log( 'PROXY RESPONSE: ' . $response->getResponseCodeWithString() );
+        }
+        
         // handle redirects
         if ($response->isRedirect() && $response->hasHeader("Location")) {
            	
@@ -185,6 +189,10 @@ $content = str_replace(
         if( isset( $_SERVER['HTTP_X_MRP_INPAGE_NAV'] ) ) {
 	        $headers[] = 'X-MRP-INPAGE-NAV: ' . $_SERVER['HTTP_X_MRP_INPAGE_NAV'];
         }
+        if( isset( $_SERVER["HTTP_LISTING_VIEWATTRS"] ) ) {
+        	$headers[] = "Listing-ViewAttrs: " . $_SERVER["HTTP_LISTING_VIEWATTRS"];
+        }
+
 
 		$headers[] = 'cache-control: no-store';
         

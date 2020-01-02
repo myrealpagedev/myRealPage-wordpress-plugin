@@ -35,6 +35,10 @@ class InlineClient {
             "Cookie: " . $this->getCookieHeader()
         );
         
+        if( isset( $_SERVER["HTTP_LISTING_VIEWATTRS"] ) ) {
+        	$this->headers[] = "Listing-ViewAttrs: " . $_SERVER["HTTP_LISTING_VIEWATTRS"];
+        }
+        
         if( isset( $_SERVER["HTTP_X_MRP_AUTO_SOLD"] ) ) {
 	        $this->headers += array(
 	        	"X-MRP-AUTO-SOLD: " . $_SERVER["HTTP_X_MRP_AUTO_SOLD"]
@@ -81,6 +85,9 @@ class InlineClient {
         }
 		
 		$this->logger->debug("Context: " . print_r($this->context->getAllValues(), true));
+
+//error_log( "DEST URL: ". $this->generateUrl());
+//error_log( "DEST HEADERS: ". print_r( $this->headers, true ) );
 
         $this->client = new Client($this->generateUrl(), array("headers" => $this->headers));
     }

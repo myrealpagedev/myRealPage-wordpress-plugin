@@ -428,6 +428,13 @@ if (!class_exists('MRPListing')) {
             }
 
             // error_log( "replacedWP" . print_r( $post, true ) );
+            
+			if( !isset( $post ) && isset( $this->synthetic_page) ) {
+				// a double ensurance; for some reason our synthetic post
+				// was not made global; let's set it here
+				$synthetic = $this->synthetic_page->detectPost([]);
+				$post = $synthetic[0];
+			}
 
             // check whether we have an MRP shortcode, and process it
             $this->debug( "Has shortcode: " . ( has_shortcode($post->post_content, 'mrp') ? "Yes" : "No" ) );
@@ -627,6 +634,7 @@ if (!class_exists('MRPListing')) {
 	            	// however, it seems in some cases pages displaying under /some/page/ are not actually lookup-able
 	            	// by the path; here is our fallback on the post_name in such cases; in this last case
 	            	// there cannot be /some/post and other/post as the page is looked up by "post" ;
+		            $this->logger->debug( "Falling back onto manual search." );
 		            $query  = $wpdb->prepare("SELECT * FROM {$wpdb->posts} WHERE post_name=%s", $searchname);
 		            $found = $wpdb->get_results($query, OBJECT_K);
 		            if( count($found) ) {
