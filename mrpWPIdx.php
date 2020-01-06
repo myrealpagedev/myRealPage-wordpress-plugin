@@ -337,7 +337,8 @@ if (!class_exists('MRPListing')) {
         * Yoast filter
         **/
         public function changeYoastDescription($desc) {
-	        if( isset($this->mrpData["title"]) ) {
+	        $regex = isset($this->config["replaceable_titles"]) ? $this->config["replaceable_titles"] : "";
+			if( $regex != "" && preg_match($regex, $_SERVER['REQUEST_URI']) && isset($this->mrpData["title"]) ) {
             	return $this->mrpData["title"];
             }
             return $desc;
