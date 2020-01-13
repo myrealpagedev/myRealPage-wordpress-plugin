@@ -51,7 +51,7 @@ class Proxy {
         
         // we have to add this cookie to simulate an auth env for hosting envs like WPEngine which look
         // for wordpress_ cookies to disable cache
-        header( "Set-Cookie: wordpress_mrp_cache=no-store; Path=/wps" );
+        header( "Set-Cookie: wordpress_mrp_cache=no-store; Path=/wps", false );
     }
 
     public function doProxy($uri, $postParams = array())
