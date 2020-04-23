@@ -1,5 +1,10 @@
 default: build
 
+setup:
+	#yarn global add cgb-scripts
+	#npm install -g cgb-scripts
+	cd mrp-blocks && npm install
+
 clean:
 	rm -f mrp-wordpress-plugin.zip
 	rm -Rf mrp-blocks/dist
