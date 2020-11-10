@@ -25,6 +25,8 @@ class Proxy {
         $this->logger = $logger == null ? new Logger("Proxy") : $logger;
         $this->cache = $cache == null ? new DBCache($this->logger) : $cache;
         $this->defaultHeaders = array(
+            "MrpInlinePort: " . ($this->isSecure() ? "443" : "80"),
+            "MrpInlineSecure: ". ($this->isSecure() ? "true": "false"),
             'X-WordPress-Site: ' . ( isset( $_SERVER['HTTP_HOST'] ) ? $_SERVER['HTTP_HOST'] : '' ),
             'X-WordPress-Referer: ' . ( isset($_SERVER['HTTP_REFERER'] ) ? $_SERVER['HTTP_REFERER'] : '' ),
             "X-Real-IP: " . ( isset( $_SERVER["REMOTE_ADDR"] ) ? $_SERVER["REMOTE_ADDR"] : "-" ),
@@ -38,47 +40,47 @@ class Proxy {
 	        $this->defaultHeaders[] = 'X-MRP-INPAGE-NAV: ' . $_SERVER['HTTP_X_MRP_INPAGE_NAV'];
         }
     }
-    
+
     private function isSecure() {
 		return	(!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || $_SERVER['SERVER_PORT'] == 443;
 	}
-	
+
    	public function nocacheHeaders()
     {
         header( "Cache-Control: no-store" );
         header( "X-MRP-DYNAMIC: " . gmdate("D, d M Y H:i:s") . " GMT" );
         header( "Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT" );
-        
+
         // we have to add this cookie to simulate an auth env for hosting envs like WPEngine which look
         // for wordpress_ cookies to disable cache
         header( "Set-Cookie: wordpress_mrp_cache=no-store; Path=/wps", false );
     }
 
     public function doProxy($uri, $postParams = array())
-    {    
+    {
         if (headers_sent()) {
             // this is bad - we'll need to send headers, and we can't
             $this->logger->error("Headers already sent: " . __METHOD__);
             return;
         }
-        
+
         $response = $this->proxy($uri, $postParams);
-        
+
         if( $response ) {
 	        error_log( 'PROXY RESPONSE: ' . $response->getResponseCodeWithString() );
         }
-        
+
         // handle redirects
         if ($response->isRedirect() && $response->hasHeader("Location")) {
-           	
+
            	$location = $response->getHeader('Location');
            	$location = preg_replace('@http://(.+?)/(.*)@', ( $this->isSecure() ? 'https://' : 'http://' ) .$_SERVER['HTTP_HOST'].'/$2', $location);
 
             header("HTTP/1.1 " . $response->getResponseCodeWithString());
             header("Location: " . $location);
-            
+
             $this->nocacheHeaders();
-            
+
             exit();
         }
 
@@ -104,7 +106,7 @@ $content = str_replace(
 
         // touch up the content length header, since the above search and replace may have broken it
         /* skip content-length altogether to prevent nginx "chunked" transfer encoding conflict
-        
+
         if ($response->getInfo('download_content_length')) {
             header('Content-Length: ' . strlen($content));
         }
@@ -125,7 +127,7 @@ $content = str_replace(
                 }
             }
         }
-        
+
         $this->nocacheHeaders();
 
         echo($content);
@@ -152,7 +154,7 @@ $content = str_replace(
         $context = $this->context;
         $client  = new Client($uri);
         $headers = $this->defaultHeaders;
-	
+
 		$hasInlineRoot = false;
 		foreach($headers as &$header) {
 			if( $header && strpos($header,'MrpInlineRoot') == 0 ) {
@@ -167,9 +169,9 @@ $content = str_replace(
         if ($context->getGoogleMapApiKey()) {
             $headers[] = 'X-Mrp-GoogleMapKey: ' . $context->getGoogleMapApiKey();
         }
-        
+
         //error_log( $uri . " -> X-Requested-With: " . $_SERVER['HTTP_X_REQUESTED_WITH'] );
-        
+
         // custom header passing
         if( isset( $_SERVER['HTTP_X_REQUESTED_WITH'] ) && $_SERVER['HTTP_X_REQUESTED_WITH'] ) {
 	        // X-Requested-With: XMLHttpRequest (normally)
@@ -195,11 +197,11 @@ $content = str_replace(
 
 
 		$headers[] = 'cache-control: no-store';
-        
+
         if ($this->getCookieAsHeader()) {
             $headers[] = $this->getCookieAsHeader();
         }
-        
+
         error_log( "PROXY HEADERS: (" . $uri . ") " . print_r( $headers, true ) );
 
         $client->setHeaders($headers);
