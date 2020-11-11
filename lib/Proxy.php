@@ -25,8 +25,6 @@ class Proxy {
         $this->logger = $logger == null ? new Logger("Proxy") : $logger;
         $this->cache = $cache == null ? new DBCache($this->logger) : $cache;
         $this->defaultHeaders = array(
-            "MrpInlinePort: " . ($this->isSecure() ? "443" : "80"),
-            "MrpInlineSecure: ". ($this->isSecure() ? "true": "false"),
             'X-WordPress-Site: ' . ( isset( $_SERVER['HTTP_HOST'] ) ? $_SERVER['HTTP_HOST'] : '' ),
             'X-WordPress-Referer: ' . ( isset($_SERVER['HTTP_REFERER'] ) ? $_SERVER['HTTP_REFERER'] : '' ),
             "X-Real-IP: " . ( isset( $_SERVER["REMOTE_ADDR"] ) ? $_SERVER["REMOTE_ADDR"] : "-" ),
