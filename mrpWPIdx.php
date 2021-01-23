@@ -352,7 +352,7 @@ if (!class_exists('MRPListing')) {
 
         public function customTheTitle($title, $id = null)
         {
-        	if( $id == -1 ) { // we have our synthetic page
+        	if( $id == PHP_INT_MAX ) { // we have our synthetic page
 
         		// special case for /evow/, we also make sure that we are not in listing details, in which case other rules apply (i.e. customTitle() check)
         		if( preg_match( '/.*\/evow\/.*/i', $_SERVER['REQUEST_URI'] ) && $this->customTitle($title) == $title ) {
@@ -666,7 +666,21 @@ if (!class_exists('MRPListing')) {
                     "post_parent" => $result->ID,
                     "post_type"   => $result->post_type
                 );
-                $synthetic = new FakePage($slug, $result->post_title, $result->post_content, $context );
+
+                $content = $result->post_content;
+
+                /* 
+                this is a TODO: we should create a setting to make details pages "greedy", then we
+                strip all other content except for our shortcode when crafting the synthetic page for the details.
+                Uncomment below 2 lines to enable greedy 
+                */
+                /*
+                // extract just the 'mrp' shortcode, parse attributes and create a context object
+                $hit = preg_match('/' . get_shortcode_regex(array('mrp')) . '/', $result->post_content, $matches);
+                $content = $matches[0];
+                */
+
+                $synthetic = new FakePage($slug, $result->post_title, $content, $context );
                 $this->synthetic_page = $synthetic;
 
                 return $synthetic;
@@ -698,7 +712,7 @@ if (!class_exists('MRPListing')) {
             // check for synthetic page, and use parent post's meta data
             // NOTE: WordPress gives us the absolute value of the post ID in $object_id,
             //       and we are expecting -1 - use $post->ID as well, as it is more reliable
-            if ($object_id == 1 && $post->ID == -1 && $post->post_parent) {
+            if ($object_id == 1 && $post->ID == PHP_INT_MAX && $post->post_parent) {
                 return get_metadata('post', $post->post_parent, $meta_key, $single);
             }
 

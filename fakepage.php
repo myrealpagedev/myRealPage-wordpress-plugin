@@ -105,8 +105,14 @@ class FakePage
          * Fake post ID to prevent WP from trying to show comments for
          * a post that doesn't really exist.
          */
-        $post->ID = -1;
-
+        //$post->ID = -1;
+        $post->ID = PHP_INT_MAX;
+        if( $this->context['post_type'] ) {
+			$post->post_type = $this->context['post_type'];
+		}
+		else {
+			$post->post_type = 'page';
+		}
         /**
          * Static means a page, not a post.
          */
