@@ -677,7 +677,9 @@ if (!class_exists('MRPListing')) {
                 /*
                 // extract just the 'mrp' shortcode, parse attributes and create a context object
                 $hit = preg_match('/' . get_shortcode_regex(array('mrp')) . '/', $result->post_content, $matches);
-                $content = $matches[0];
+                if( $hit ) {
+                    $content = $matches[0];
+                }
                 */
 
                 $synthetic = new FakePage($slug, $result->post_title, $content, $context );
