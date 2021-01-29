@@ -669,18 +669,20 @@ if (!class_exists('MRPListing')) {
 
                 $content = $result->post_content;
 
-                /* 
+                /*
                 this is a TODO: we should create a setting to make details pages "greedy", then we
                 strip all other content except for our shortcode when crafting the synthetic page for the details.
-                Uncomment below 2 lines to enable greedy 
+                Uncomment below 2 lines to enable greedy
                 */
-                /*
-                // extract just the 'mrp' shortcode, parse attributes and create a context object
+				// extract just the 'mrp' shortcode, parse attributes and create a context object
                 $hit = preg_match('/' . get_shortcode_regex(array('mrp')) . '/', $result->post_content, $matches);
-                if( $hit ) {
-                    $content = $matches[0];
-                }
-                */
+                if( $hit) {
+					$attrs = shortcode_parse_atts($matches[0]);
+					if( isset($attrs["greedy"]) && stripos($attrs["greedy"], "true") !== false) {
+						$content = $matches[0];
+					}
+				}
+
 
                 $synthetic = new FakePage($slug, $result->post_title, $content, $context );
                 $this->synthetic_page = $synthetic;
