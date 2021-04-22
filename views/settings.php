@@ -10,7 +10,7 @@
 				<form name="mrp_options" method="POST" action="<?php echo esc_html(str_replace('%7E', '~', $_SERVER['REQUEST_URI'])) ?>">
 					<input type="hidden" name="mrp_submit_hidden" value="Y"/>
 					<input type="text" name="mrp_google_api_key" value="<?php echo esc_html($this->getOption("mrp_google_api_key")) ?>" />
-					<input type="hidden" name="mrp_debug" value="1" <?php echo esc_html(($this->getOption("mrp_debug") ? "checked" : "")) ?>/>
+					<input type="hidden" name="mrp_debug" value=""/>
 					<input type="submit" name="Save" value="Save" class="button button-primary"/>
 				</form>
 			</td>
