@@ -182,7 +182,7 @@ class InlineClient {
             // root the the location to the local site
             $location = $response->getHeader('Location');
             //error_log( "REDIRECT: " . $location );
-            $location = preg_replace('@http://(.+?)/(.*)@', ( $this->isSecure() ? 'https://' : 'http://' ) .$_SERVER['HTTP_HOST'].'/$2', $location);
+            $location = preg_replace('@https://(.+?)/(.*)@', ( $this->isSecure() ? 'https://' : 'http://' ) .$_SERVER['HTTP_HOST'].'/$2', $location);
 
             if( substr( $location, -1 ) != "/" ) {
 	            $location .= "/";
@@ -432,7 +432,7 @@ class InlineClient {
         $url .= $context->has("context") ? $context->get("context") : "";
         $url .= '/' . $context->get("accountId");
         $url .= '/';
-        $url  = 'http://' . preg_replace('/(\/+)/', '/', $url);
+        $url  = 'https://' . preg_replace('/(\/+)/', '/', $url);
 
         $isIDXBrowse = false;
 

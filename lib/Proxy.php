@@ -21,7 +21,7 @@ class Proxy {
         $cache = null
     ) {
         $this->context = $context;
-        $this->host = "http://" . InlineClient::SERVER;
+        $this->host = "https://" . InlineClient::SERVER;
         $this->logger = $logger == null ? new Logger("Proxy") : $logger;
         $this->cache = $cache == null ? new DBCache($this->logger) : $cache;
         $this->defaultHeaders = array(
@@ -73,7 +73,7 @@ class Proxy {
         if ($response->isRedirect() && $response->hasHeader("Location")) {
 
            	$location = $response->getHeader('Location');
-           	$location = preg_replace('@http://(.+?)/(.*)@', ( $this->isSecure() ? 'https://' : 'http://' ) .$_SERVER['HTTP_HOST'].'/$2', $location);
+           	$location = preg_replace('@https://(.+?)/(.*)@', ( $this->isSecure() ? 'https://' : 'http://' ) .$_SERVER['HTTP_HOST'].'/$2', $location);
 
             header("HTTP/1.1 " . $response->getResponseCodeWithString());
             header("Location: " . $location);
