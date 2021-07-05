@@ -55,6 +55,11 @@ class Client
         curl_setopt($ch, CURLOPT_HEADER, true);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, false);
 
+        // it's important to set HTTP/1.1 option because the default is h2 which
+        // in turn causes the capitalization of headers to be off (h2 returns lowercase headers 
+        // and we check properly capitalized ones)
+        curl_setopt($ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
+
         if ($this->hasHeaders()) {
             $this->removeHeader('Expect');
             $headers = array();
