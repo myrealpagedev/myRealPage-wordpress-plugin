@@ -419,6 +419,50 @@ if (!class_exists('MRPListing')) {
 	        header( "Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT" );
         }
 
+        /*
+        this function is necessary to move ibf_xxx type parmeters from init_attr to perm_attr
+        for the idx browse to function properly. This mistake was made early on and currently there
+        would be many shortcodes with the params set in the init_attr instead of perm_attr
+        this is a retrofit fix.
+        */
+        public function fixIdxBrowseAttrs( $attrs ) {
+			if( empty($attrs) ) {
+				return $attrs;
+			}
+			$initAttrs = isset($attrs["init_attr"]) ? $attrs["init_attr"] : "";
+			if( empty($initAttrs) ) {
+				return $attrs;
+			}
+			$initAttrsArray = explode( ",", $initAttrs );
+			if( empty($initAttrsArray) ) {
+				return $attrs;
+			}
+			
+			$permAttrs = isset($attrs["perm_attr"]) ? $attrs["perm_attr"] : "" ;
+			
+			$initAttrsOut = [];
+			
+			foreach( $initAttrsArray as $attr ) {
+				if( strpos( $attr, "ibf_" ) == 0 ) {
+					if( !empty($permAttrs) ) {
+						$permAttrs = $permAttrs . ",";
+					}
+					$permAttrs = $permAttrs . $attr;
+				}
+				else {
+					array_push($initAttrsOut, $attr );
+				}
+			}
+			//error_log( "To fix init_attr " . print_r($initAttrsArray,true));
+			//error_log( "new init attr " . join(",", $initAttrsOut ) );
+			//error_log( "new perm attr " . $permAttrs );
+			
+			$attrs["init_attr"] = join(",", $initAttrsOut );
+			$attrs["perm_attr"] = $permAttrs;
+			
+			return $attrs;
+		}
+
         public function replacedWP($wp)
         {
             global $wp_query, $post;
@@ -469,6 +513,7 @@ if (!class_exists('MRPListing')) {
                 $attrs = array_map($cleanAttributes, $attrs);
                 $this->debug("Parsed Shortcode: " . print_r($attrs, true));
                 //error_log("Parsed Shortcode: " . print_r($attrs, true));
+                $attrs = $this->fixIdxBrowseAttrs( $attrs );
                 $attrs = $attrs +
                     array(
                         "pageName"        => $this->getPageName(),
