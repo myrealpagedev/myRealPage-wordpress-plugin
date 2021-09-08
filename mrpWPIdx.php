@@ -761,7 +761,7 @@ if (!class_exists('MRPListing')) {
             // check for synthetic page, and use parent post's meta data
             // NOTE: WordPress gives us the absolute value of the post ID in $object_id,
             //       and we are expecting -1 - use $post->ID as well, as it is more reliable
-            if ($object_id == 1 && $post->ID == PHP_INT_MAX && $post->post_parent) {
+            if ($object_id == PHP_INT_MAX && $post->ID == PHP_INT_MAX && $post->post_parent) {
                 return get_metadata('post', $post->post_parent, $meta_key, $single);
             }
 
