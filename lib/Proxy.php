@@ -72,8 +72,10 @@ class Proxy {
         // handle redirects
         if ($response->isRedirect() && $response->hasHeader("Location")) {
 
-           	$location = $response->getHeader('Location');
-           	$location = preg_replace('@https://(.+?)/(.*)@', ( $this->isSecure() ? 'https://' : 'http://' ) .$_SERVER['HTTP_HOST'].'/$2', $location);
+            $location = $response->getHeader('Location');
+			if( preg_match('@http(s?):\/\/(.+\.myrealpage.com?)\/.*@', $location, $matches)) {
+				$location = preg_replace('@http(s?)://(.+?)/(.*)@', ( $this->isSecure() ? 'https://' : 'http://' ) .$_SERVER['HTTP_HOST'].'/$3', $location);
+			}
 
             header("HTTP/1.1 " . $response->getResponseCodeWithString());
             header("Location: " . $location);
