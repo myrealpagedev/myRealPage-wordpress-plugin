@@ -2,3 +2,4 @@
 .vscode
 node_modules
 mrp-wordpress-plugin.zip
+docker-compose.yml
