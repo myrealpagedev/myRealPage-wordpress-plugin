@@ -340,7 +340,8 @@ if (!class_exists('MRPListing')) {
         **/
         public function changeYoastDescription($desc) {
 	        $regex = isset($this->config["replaceable_titles"]) ? $this->config["replaceable_titles"] : "";
-			if( $this->synthetic_page && $regex != "" && preg_match($regex, $_SERVER['REQUEST_URI']) && isset($this->mrpData["title"]) ) {
+			// should we really only care about the synthetic pages anyways??
+			if( $this->synthetic_page /*&& $regex != "" && preg_match($regex, $_SERVER['REQUEST_URI'])  */ && isset($this->mrpData["title"]) ) {
             	return $this->mrpData["title"];
             }
             return $desc;
@@ -348,7 +349,8 @@ if (!class_exists('MRPListing')) {
 		
 		public function changeYoastTitle($title) {
 	        $regex = isset($this->config["replaceable_titles"]) ? $this->config["replaceable_titles"] : "";
-			if( $this->synthetic_page && $regex != "" && preg_match($regex, $_SERVER['REQUEST_URI']) && isset($this->mrpData["title"]) ) {
+			// should we really only care about the synthetic pages anyways??
+			if( $this->synthetic_page /* && $regex != "" && preg_match($regex, $_SERVER['REQUEST_URI']) */ && isset($this->mrpData["title"]) ) {
             	return $this->mrpData["title"];
             }
             return $title;
@@ -357,7 +359,8 @@ if (!class_exists('MRPListing')) {
 		public function changeYoastCanonicalLink($link) {
 	        global $wp;
 			$regex = isset($this->config["replaceable_titles"]) ? $this->config["replaceable_titles"] : "";
-			if( $this->synthetic_page && $regex != "" && preg_match($regex, $_SERVER['REQUEST_URI']) && isset($this->mrpData["title"]) ) {
+			// should we really only care about the synthetic pages anyways??
+			if( $this->synthetic_page /* && $regex != "" && preg_match($regex, $_SERVER['REQUEST_URI']) */ && isset($this->mrpData["title"]) ) {
 				$out = home_url( $wp->request );
             	return substr($out,-1) === "/" ? $out : ( $out . "/");
             }
