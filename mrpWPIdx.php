@@ -182,8 +182,10 @@ if (!class_exists('MRPListing')) {
             add_filter('the_title', array(&$this, 'customTheTitle'), 1, 2 );
 
             // custom filter for Yoast
+            add_filter('wpseo_title', array(&$this,'changeYoastTitle'),100,1);
             add_filter('wpseo_metadesc', array(&$this,'changeYoastDescription'),100,1);
-            add_filter('wpseo_canonical', array(&$this,'canonicalLink'),100,1);
+            //add_filter('wpseo_canonical', array(&$this,'canonicalLink'),100,1);
+			add_filter('wpseo_canonical', array(&$this,'changeYoastCanonicalLink'),100,1);
 
             // add debug/error logs to end of page contents
             add_action("wp_footer", array(&$this, "outputLogs"));
@@ -334,14 +336,35 @@ if (!class_exists('MRPListing')) {
         }
 
         /**
-        * Yoast filter
+        * Yoast filters
         **/
         public function changeYoastDescription($desc) {
 	        $regex = isset($this->config["replaceable_titles"]) ? $this->config["replaceable_titles"] : "";
-			if( $regex != "" && preg_match($regex, $_SERVER['REQUEST_URI']) && isset($this->mrpData["title"]) ) {
+			// should we really only care about the synthetic pages anyways??
+			if( $this->synthetic_page /*&& $regex != "" && preg_match($regex, $_SERVER['REQUEST_URI'])  */ && isset($this->mrpData["title"]) ) {
             	return $this->mrpData["title"];
             }
             return $desc;
+        }
+		
+		public function changeYoastTitle($title) {
+	        $regex = isset($this->config["replaceable_titles"]) ? $this->config["replaceable_titles"] : "";
+			// should we really only care about the synthetic pages anyways??
+			if( $this->synthetic_page /* && $regex != "" && preg_match($regex, $_SERVER['REQUEST_URI']) */ && isset($this->mrpData["title"]) ) {
+            	return $this->mrpData["title"];
+            }
+            return $title;
+        }
+
+		public function changeYoastCanonicalLink($link) {
+	        global $wp;
+			$regex = isset($this->config["replaceable_titles"]) ? $this->config["replaceable_titles"] : "";
+			// should we really only care about the synthetic pages anyways??
+			if( $this->synthetic_page /* && $regex != "" && preg_match($regex, $_SERVER['REQUEST_URI']) */ && isset($this->mrpData["title"]) ) {
+				$out = home_url( $wp->request );
+            	return substr($out,-1) === "/" ? $out : ( $out . "/");
+            }
+            return $link;
         }
 
         public function canonicalLink($canonical) {
