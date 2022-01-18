@@ -206,7 +206,9 @@ $content = str_replace(
         error_log( "PROXY HEADERS: (" . $uri . ") " . print_r( $headers, true ) );
 
         $client->setHeaders($headers);
-        if (count($postParams)) {
+        // OLD if (count($postParams)) {
+        // NEW https://stackoverflow.com/questions/66671269/fatal-error-uncaught-typeerror-count-argument-1-var-must-be-of-type-cou
+        if (count((array)$postParams)) { 
             $client->setParams($postParams);
             $client->setMethod(Client::POST);
         }
