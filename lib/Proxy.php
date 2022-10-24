@@ -124,14 +124,37 @@ $content = str_replace(
                 ) {
                     header("$name: $value");
                 } elseif ($name == "Set-Cookie") {
-                    header("$name: $value", false);
+                    // skip, this is a multi-header
+                    //header("$name: $value", false);
                 }
             }
         }
 
+        $this->outputCookieHeaders($response);
+
         $this->nocacheHeaders();
 
         echo($content);
+    }
+
+    public function outputCookieHeaders($response)
+	{
+
+	    $cookies = $response->getCookies();
+        //$this->logger->debug("Setting cookies: " . print_r($cookies,true) );
+        foreach( $cookies as $cookie ) {
+			parse_str(strtr($cookie, array('&' => '%26', '+' => '%2B', ';' => '&')), $parsed);
+			if( isset($parsed['mrp_sort']) && $parsed['mrp_sort']) {
+				$mod_sorted_cookie = "mrp_sort=" . $parsed["mrp_sort"] . "; Path=/";
+				error_log( "SORT COOKIE: " . $mod_sorted_cookie );
+				header( "Set-Cookie:" . $mod_sorted_cookie, false );
+			}
+			else {
+				$this->logger->debug("Setting cookie: " . $cookie );
+				header( "Set-Cookie:" . $cookie, false );
+			}
+        }
+        //error_log( "COOKIES: " . print_r( $response->getCookies(), true ));
     }
 
     /**
