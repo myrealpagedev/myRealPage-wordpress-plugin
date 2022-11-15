@@ -637,8 +637,12 @@ if ( !class_exists('Puc_v4p4_Plugin_UpdateChecker', false) ):
 				//Convert both paths to the canonical form before comparison.
 				$muPluginDir = realpath(WPMU_PLUGIN_DIR);
 				$pluginPath  = realpath($this->pluginAbsolutePath);
-
-				$cachedResult = (strpos($pluginPath, $muPluginDir) === 0);
+				if( $muPluginDir && $pluginPath ) {
+					$cachedResult = (strpos($pluginPath, $muPluginDir) === 0);
+				}
+				else {
+					$cachedResult = false;
+				}
 			}
 
 			return $cachedResult;
