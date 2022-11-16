@@ -695,23 +695,27 @@ if (!class_exists('MRPListing')) {
             $this->logger->debug( "pagename: " . $pagename );
             //$this->logger->debug( "result: " . print_r( $result, true ) );
 
-            $page_by_slug = get_page_by_path( $pagename, OBJECT, 'page' );
-            if( !$page_by_slug ) {
-	            $page_by_slug = get_page_by_path( $pagename, OBJECT, 'post' );
-	            if( !$page_by_slug ) {
-	            	// looking up pages by path is the correct way to go about it as pages may be some/page
-	            	// however, it seems in some cases pages displaying under /some/page/ are not actually lookup-able
-	            	// by the path; here is our fallback on the post_name in such cases; in this last case
-	            	// there cannot be /some/post and other/post as the page is looked up by "post" ;
-		            $this->logger->debug( "Falling back onto manual search." );
-		            $query  = $wpdb->prepare("SELECT * FROM {$wpdb->posts} WHERE post_name=%s", $searchname);
-		            $found = $wpdb->get_results($query, OBJECT_K);
-		            if( count($found) ) {
-			            $page_by_slug = reset($found);
-			            $this->logger->debug( "found page via direct SQL and : " . $searchname );
-		            }
-	            }
+            $page_by_slug = null;
+            if( $pagename ) {
+                $page_by_slug = get_page_by_path( $pagename, OBJECT, 'page' );
+                if( !$page_by_slug ) {
+                    $page_by_slug = get_page_by_path( $pagename, OBJECT, 'post' );
+                    if( !$page_by_slug ) {
+                        // looking up pages by path is the correct way to go about it as pages may be some/page
+                        // however, it seems in some cases pages displaying under /some/page/ are not actually lookup-able
+                        // by the path; here is our fallback on the post_name in such cases; in this last case
+                        // there cannot be /some/post and other/post as the page is looked up by "post" ;
+                        $this->logger->debug( "Falling back onto manual search." );
+                        $query  = $wpdb->prepare("SELECT * FROM {$wpdb->posts} WHERE post_name=%s", $searchname);
+                        $found = $wpdb->get_results($query, OBJECT_K);
+                        if( count($found) ) {
+                            $page_by_slug = reset($found);
+                            $this->logger->debug( "found page via direct SQL and : " . $searchname );
+                        }
+                    }
+                }
             }
+            
             $this->logger->debug( "page_by_slug: " . print_r( $page_by_slug, true ) );
             //error_log( "page_by_slug: " . print_r( $page_by_slug, true ) );
 
