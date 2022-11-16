@@ -225,7 +225,7 @@ class FakePage
 			$wp_query->is_posts_page = false;
 			$wp_query->is_post_type_archive = false;
         }
-        remove_filter('the_posts',array(&$this,'detectPost')); //glock. add this to not to brake other page loops
+        remove_filter('the_posts',array(&$this,'detectPost'), 100000); //glock. add this to not to brake other page loops
         return $posts;
     }
 }
