@@ -169,8 +169,8 @@ if (!class_exists('MRPListing')) {
             add_action('wp_head', array(&$this, 'addHeader'));
 
             // replace title with custom MRP one.
-            add_filter('wp_title', array(&$this, 'customTitle'), 1);
-            add_filter('pre_get_document_title', array(&$this, 'customTitle'), 1);
+            add_filter('wp_title', array(&$this, 'customTitle'), 100000);
+            add_filter('pre_get_document_title', array(&$this, 'customTitle'), 100000);
 
             // ensure we set post meta data based on the parent, for synthetic pages
             add_filter('get_post_metadata', array(&$this, 'getPostMetadata'), 99, 4);
