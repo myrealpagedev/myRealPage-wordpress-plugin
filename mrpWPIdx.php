@@ -497,7 +497,8 @@ if (!class_exists('MRPListing')) {
 
             // error_log( "replacedWP" . print_r( $post, true ) );
 
-			if( !isset( $post ) && isset( $this->synthetic_page) ) {
+            // ensure that we use synthetic page for the post if present
+			if( /* !isset( $post ) && */ isset( $this->synthetic_page) ) {
 				// a double ensurance; for some reason our synthetic post
 				// was not made global; let's set it here
 				$synthetic = $this->synthetic_page->detectPost([]);
