@@ -22,6 +22,13 @@ class InlineClient {
         $this->context = !is_null($context) ? $context : new Context();
         $this->logger  = $logger;
 
+        $current_url = sprintf(
+            '%s://%s%s',
+            isset($_SERVER['HTTPS']) ? 'https' : 'http',
+            $_SERVER['HTTP_HOST'],
+            $_SERVER['REQUEST_URI']
+        );
+
         // add default headers
         $this->headers += array(
 			"MrpStripPowered: false",
@@ -33,7 +40,8 @@ class InlineClient {
             "X-MRP-TMPL: v2",
             "X-Real-IP: " . ( isset( $_SERVER["REMOTE_ADDR"] ) ? $_SERVER["REMOTE_ADDR"] : "-" ),
             //"X-MRP-Server-Debug: true",
-            "Cookie: " . $this->getCookieHeader()
+            "Cookie: " . $this->getCookieHeader(),
+            "MrpOriginalURL: " . $current_url
         );
 
         if( isset( $_SERVER["HTTP_LISTING_VIEWATTRS"] ) ) {
