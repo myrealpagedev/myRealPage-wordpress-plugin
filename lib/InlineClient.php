@@ -532,7 +532,12 @@ class InlineClient {
                 if (is_array($value)) {
                     continue;
                 }
-                $cookie .= $name . "=" . urlencode($value) . "; ";
+                if( $name == "mrptc" ) {
+                    $cookie .= "$name=".($value)."; ";
+                }
+                else {
+                    $cookie .= $name . "=" . urlencode($value) . "; ";
+                }
             }
         }
 

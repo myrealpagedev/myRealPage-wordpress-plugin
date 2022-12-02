@@ -38,6 +38,12 @@ class Proxy {
         if( isset( $_SERVER['HTTP_X_MRP_INPAGE_NAV'] ) ) {
 	        $this->defaultHeaders[] = 'X-MRP-INPAGE-NAV: ' . $_SERVER['HTTP_X_MRP_INPAGE_NAV'];
         }
+        if( isset( $_SERVER['HTTP_MRPORIGINALURL'] ) ) {
+            $this->defaultHeaders[] = 'MrpOriginalURL: ' . $_SERVER['HTTP_MRPORIGINALURL'];
+        }
+        if( isset( $_SERVER['HTTP_REFERER'] ) ) {
+            $this->defaultHeaders[] = 'Referer: ' . $_SERVER['HTTP_REFERER'];
+        }
     }
 
     private function isSecure() {
@@ -251,7 +257,12 @@ $content = str_replace(
         if (count($_COOKIE)) {
             foreach($_COOKIE as $name => $value) {
                 if (!is_array($value)) {
-                    $cookie .= "$name=".urlencode($value)."; ";
+                    if( $name == "mrptc" ) {
+						$cookie .= "$name=".($value)."; ";
+					}
+                    else {
+                        $cookie .= "$name=".urlencode($value)."; ";
+                    }
                 }
             }
         }
