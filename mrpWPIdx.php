@@ -186,6 +186,11 @@ if (!class_exists('MRPListing')) {
             add_filter('wpseo_metadesc', array(&$this,'changeYoastDescription'),100,1);
             //add_filter('wpseo_canonical', array(&$this,'canonicalLink'),100,1);
 			add_filter('wpseo_canonical', array(&$this,'changeYoastCanonicalLink'),100,1);
+            add_filter('wpseo_opengraph_title', array(&$this,'unsetYoastTagOnDetails'),10000,1);
+			add_filter('wpseo_opengraph_desc', array(&$this,'unsetYoastTagOnDetails'),10000,1);
+			add_filter('wpseo_opengraph_url', array(&$this,'unsetYoastTagOnDetails'),10000,1);
+			add_filter('wpseo_opengraph_type', array(&$this,'unsetYoastTagOnDetails'),10000,1);
+
 
             // add debug/error logs to end of page contents
             add_action("wp_footer", array(&$this, "outputLogs"));
@@ -338,6 +343,12 @@ if (!class_exists('MRPListing')) {
         /**
         * Yoast filters
         **/
+        public function unsetYoastTagOnDetails($data) {
+			if( $this->synthetic_page ) {
+				return false;
+			}
+			return $data;
+		}
         public function changeYoastDescription($desc) {
 	        $regex = isset($this->config["replaceable_titles"]) ? $this->config["replaceable_titles"] : "";
 			// should we really only care about the synthetic pages anyways??
