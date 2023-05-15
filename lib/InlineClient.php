@@ -24,8 +24,7 @@ class InlineClient {
 
         $current_url = sprintf(
             '%s://%s%s',
-            // isset($_SERVER['HTTPS']) ? 'https' : 'http',
-            'https',
+            isset($_SERVER['HTTPS']) ? 'https' : 'http',
             $_SERVER['HTTP_HOST'],
             $_SERVER['REQUEST_URI']
         );
