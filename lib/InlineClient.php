@@ -517,11 +517,11 @@ class InlineClient {
     {
         $cookie = "";
 
-        if ( function_exists('getallheaders') && getallheaders() ) {
-	        $this->logger->debug( 'RAW COOKIE HEADER: ' . getallheaders()['Cookie'] );
+        if ( function_exists('getallheaders') && getallheaders() && array_key_exists('Cookie', getallheaders())) {
+	        $this->logger->debug( 'RAW COOKIE HEADER 1: ' . getallheaders()['Cookie'] );
         }
-        elseif( !function_exists('getallheaders') ) {
-        	$this->logger->debug( 'RAW COOKIE HEADER: ' . $_SERVER['HTTP_Cookie'] );
+        elseif( !function_exists('getallheaders') && array_key_exists('HTTP_Cookie', $_SERVER)) {
+        	$this->logger->debug( 'RAW COOKIE HEADE 2: ' . $_SERVER['HTTP_Cookie'] );
         }
 
         $this->logger->debug( '$_COOKIE: ' . print_r($_COOKIE,true) . " COUNT: " . count($_COOKIE) );

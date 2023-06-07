@@ -517,7 +517,7 @@ if (!class_exists('MRPListing')) {
 			}
 
             // check whether we have an MRP shortcode, and process it
-            $this->debug( "Has shortcode: " . ( has_shortcode($post->post_content, 'mrp') ? "Yes" : "No" ) );
+            $this->debug( "Has shortcode: " . ( is_object($post) && property_exists($post, 'post_content') && has_shortcode($post->post_content, 'mrp') ? "Yes" : "No" ) );
             if ( isset($post) && has_shortcode($post->post_content, 'mrp')) {
 
             	// add trailing slash if necessary; otherwise listing details don't work
