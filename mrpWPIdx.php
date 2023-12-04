@@ -373,8 +373,22 @@ if (!class_exists('MRPListing')) {
 			// should we really only care about the synthetic pages anyways??
 			if( isset($this->synthetic_page) && $this->synthetic_page /* && $regex != "" && preg_match($regex, $_SERVER['REQUEST_URI']) */ && isset($this->mrpData["title"]) ) {
 				$out = home_url( $wp->request );
-            	return substr($out,-1) === "/" ? $out : ( $out . "/");
+				if( stristr( $out, '/SearchResults.form' ) ) {
+					$out = str_ireplace( '/SearchResults.form', '/', $out );
+				}
+            	$out = substr($out,-1) === "/" ? $out : ( $out . "/");
+				if( isset($_GET["_pg"])) {
+					$out .= "?_pg=" . $_GET["_pg"];
+				}
+				return $out;
             }
+			if( stristr( $link, '/SearchResults.form/' ) ) {
+				$link = str_ireplace( '/SearchResults.form/', '/', $link );
+			}
+			if( stristr( $link, '/SearchResults.form' ) ) {
+				$link = str_ireplace( '/SearchResults.form', '/', $link );
+			}
+			
             return $link;
         }
 
