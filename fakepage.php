@@ -29,6 +29,8 @@ class FakePage
      */
     var $page_content = '';
 
+    var $context = null;
+    
 
     /**
      * Allow pings?

@@ -44,6 +44,8 @@ if (!class_exists('MRPListing')) {
         const GOOGLE_MAP_API_KEY = "mrp_google_api_key";
         const CONFIG_OPT_NAME    = "mrp_config";
 
+        private $synthetic_page = null;
+
         public function __construct()
         {
             $this->loadRequired();
@@ -181,6 +183,10 @@ if (!class_exists('MRPListing')) {
             // breadcrumbs, etc.
             add_filter('the_title', array(&$this, 'customTheTitle'), 1, 2 );
 
+
+            add_filter('pre_get_shortlink', array(&$this, 'customShortlink'), 10, 4 );
+
+
             // custom filter for Yoast
             add_filter('wpseo_title', array(&$this,'changeYoastTitle'),100,1);
             add_filter('wpseo_metadesc', array(&$this,'changeYoastDescription'),100,1);
@@ -215,6 +221,13 @@ if (!class_exists('MRPListing')) {
 				require_once plugin_dir_path( __FILE__ ) . './mrp-blocks/src/init.php';
 			}
 		}
+
+        function customShortlink( $shortlink, $id, $context, $allow_slugs ) {
+            if( isset($this->synthetic_page) && $this->synthetic_page ) {
+                return "";
+            }
+        	return false;
+        }
 
         function createMrpBlocksCategory( $categories, $post ) {
             return array_merge(
@@ -1112,7 +1125,9 @@ if (!class_exists('MRPListing')) {
                 list($pageName, $extension) = $this->processManagedUrl($url);
                 //error_log( $pageName . ":" . $extension . ":" . $url );
             }
-            if (substr($pageName, -1) == '/') {
+
+
+            if ($pageName != null && substr($pageName, -1) == '/') {
                 $pageName = substr($pageName, 0, strlen($pageName) - 1);
             }
             return $pageName;

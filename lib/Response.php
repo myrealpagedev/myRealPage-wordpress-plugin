@@ -7,6 +7,7 @@
 namespace MRPIDX\HTTP;
 
 class Response {
+    public $cookies; 
     protected $headers;
     protected $content;
     protected $info;
