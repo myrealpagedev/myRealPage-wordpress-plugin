@@ -362,6 +362,7 @@ class InlineClient {
         }
     }
 
+
     public function outputCookieHeaders()
 	{
 
@@ -381,7 +382,12 @@ class InlineClient {
 				header( "Set-Cookie:" . $cookie, false );
 			}
         }
-        //error_log( "COOKIES: " . print_r( $response->getCookies(), true ));
+
+        $uri  = $_SERVER["REQUEST_URI"];
+        $url_components = parse_url($uri);
+        $path = $url_components['path'];
+        header( "Set-Cookie: wordpress_mrp_cache=no-store; Path=".$path, false );
+
     }
 
     public function getHeaders()
