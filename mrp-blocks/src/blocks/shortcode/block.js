@@ -190,7 +190,7 @@ registerBlockType( 'cgb/mrp-shortcode-block', {
 					Retrieve myRealPage Shortcode
 				</Button>
 				<br />
-				<b>Shorcode:</b>
+				<b>Shortcode:</b>
 				<br />
 				<textarea rows="4" cols="50" onChange={ ( event ) => updateContent( event.target.value ) } value={ shortcode } />
 			</div>
