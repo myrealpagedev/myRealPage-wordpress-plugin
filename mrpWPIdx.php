@@ -217,7 +217,7 @@ if (!class_exists('MRPListing')) {
 
 			// Gutenberg Support
 			if ( function_exists( 'register_block_type' ) ) {
-				add_filter( 'block_categories', array(&$this,"createMrpBlocksCategory" ), 10, 2);
+				add_filter( 'block_categories_all', array(&$this,"createMrpBlocksCategory" ), 10, 2);
 				require_once plugin_dir_path( __FILE__ ) . './mrp-blocks/src/init.php';
 			}
 		}
