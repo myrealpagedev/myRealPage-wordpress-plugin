@@ -407,7 +407,7 @@ if (!class_exists('MRPListing')) {
 
         public function canonicalLink($canonical) {
         	// future place for tweaking YOAST canonical URLs if necessary
-        	//error_log( 'CANONICAL CALLED ' . $canonical );
+        	// error_log( 'CANONICAL CALLED ' . $canonical );
 	        return $canonical;
         }
 
@@ -435,7 +435,7 @@ if (!class_exists('MRPListing')) {
 				if( $regex != "" && preg_match($regex, $_SERVER['REQUEST_URI']) && isset($this->mrpData["title"]) ) {
 	        		return $this->mrpData["title"];
         		}
-	        	//error_log( "SYNTHETIC TITLE!!!: " . $this->mrpData["title"] );
+	        	// error_log( "SYNTHETIC TITLE!!!: " . $this->mrpData["title"] );
         	}
             return $title;
         }
@@ -514,9 +514,9 @@ if (!class_exists('MRPListing')) {
 					array_push($initAttrsOut, $attr );
 				}
 			}
-			//error_log( "To fix init_attr " . print_r($initAttrsArray,true));
-			//error_log( "new init attr " . join(",", $initAttrsOut ) );
-			//error_log( "new perm attr " . $permAttrs );
+			// error_log( "To fix init_attr " . print_r($initAttrsArray,true));
+			// error_log( "new init attr " . join(",", $initAttrsOut ) );
+			// error_log( "new perm attr " . $permAttrs );
 			
 			$attrs["init_attr"] = join(",", $initAttrsOut );
 			$attrs["perm_attr"] = $permAttrs;
@@ -553,7 +553,7 @@ if (!class_exists('MRPListing')) {
 
                 	$parts = explode('?', $_SERVER['REQUEST_URI'], 2);
                 	if (substr($parts[0], -1) !== '/') {
-                		error_log( 'TRAILING SLASH FIX: ' . $_SERVER['REQUEST_URI'] );
+                		// error_log( 'TRAILING SLASH FIX: ' . $_SERVER['REQUEST_URI'] );
 					    $uri = $parts[0].'/'.(isset($parts[1]) ? '?'.$parts[1] : '');
 					    header('Location: '.$uri, true, 302);
 					    die();
@@ -574,7 +574,7 @@ if (!class_exists('MRPListing')) {
                 };
                 $attrs = array_map($cleanAttributes, $attrs);
                 $this->debug("Parsed Shortcode: " . print_r($attrs, true));
-                //error_log("Parsed Shortcode: " . print_r($attrs, true));
+                // error_log("Parsed Shortcode: " . print_r($attrs, true));
                 $attrs = $this->fixIdxBrowseAttrs( $attrs );
                 $attrs = $attrs +
                     array(
@@ -584,10 +584,10 @@ if (!class_exists('MRPListing')) {
                         "googleMapApiKey" => $this->getOption(self::GOOGLE_MAP_API_KEY)
                     );
 
-				//error_log( "$attrs: ". print_r( $attrs, true ) );
+				// error_log( "$attrs: ". print_r( $attrs, true ) );
                 $context = new \MRPIDX\Context($attrs);
 
-                //error_log( "ATTS: " . print_r( $attrs, true ) );
+                // error_log( "ATTS: " . print_r( $attrs, true ) );
                 if( isset($attrs["searchform_def"]) && $attrs["searchform_def"] != "" &&
                 	$attrs["searchform_def"] != "idx.browse" &&
                 	( !isset($attrs["extension"]) || $attrs["extension"] == "" )) {
@@ -645,8 +645,8 @@ if (!class_exists('MRPListing')) {
                 // create a client for operating within the new (local) context
                 //$client = new \MRPIDX\InlineClient($this->logger, new \MRPIDX\Context($attrs));
                 //return $client->getEmbeddedFormJS();
-                //error_log( "replaceContent $attrs: ". print_r( $attrs, true ) );
-                //error_log( "replaceContent: bypass for searchform_def" );
+                // error_log( "replaceContent $attrs: ". print_r( $attrs, true ) );
+                // error_log( "replaceContent: bypass for searchform_def" );
 
                 $script1= "\n<script src='//" . \MRPIDX\InlineClient::RES_SERVER .
                 	"/wps/rest/" . $attrs["account_id"] . "/l/recip/tmpl2.js'></script>\n";
@@ -688,7 +688,7 @@ if (!class_exists('MRPListing')) {
             $uri  = $_SERVER["REQUEST_URI"];
 
             $this->logger->debug( "This is managed URL: ". $uri . "|" . $this->isManagedUrl($uri) );
-            error_log( "This is managed URL: ". $uri . "|" . $this->isManagedUrl($uri) );
+            // error_log( "This is managed URL: ". $uri . "|" . $this->isManagedUrl($uri) );
 
             // redirect URLs with "/l/" from the old plugin
 			if( strstr( $uri, "/l/" ) && !strstr( $uri, "/wps/" ) && !strstr( strtolower($uri), "/unibox.search" ) ) {
@@ -703,7 +703,7 @@ if (!class_exists('MRPListing')) {
 
             // strip off the extension part, and grab our page name from the slug
             list($pagename, $extension) = $this->processManagedUrl($uri);
-            error_log( "handleRequest: " . $pagename . ":" . $extension );
+            // error_log( "handleRequest: " . $pagename . ":" . $extension );
 
             $searchname = $pagename;
 
@@ -711,7 +711,7 @@ if (!class_exists('MRPListing')) {
             if( strripos( "$pagename", '/' ) ) {
 
 	            $searchname = substr( $pagename, strripos( "$pagename", '/' ) + 1 );
-	            //error_log( "SEARCHNAME: ". $searchname );
+	            // error_log( "SEARCHNAME: ". $searchname );
 
 	            // ensure we don't have false nested URLs, like '/foo/listings/listings/listings/listing-details.xyz
 				if( preg_match( "@($searchname\/){1,}@", $pagename . '/', $matches ) ) {
@@ -719,7 +719,7 @@ if (!class_exists('MRPListing')) {
 					// do a replace and redirect
 					if( $matches[0] != $matches[1] ) {
 						$redir = str_replace( $matches[0], $matches[1], $uri );
-						error_log( 'REDIRECTING URL WITH BAD NESTING: ' . $uri );
+						// error_log( 'REDIRECTING URL WITH BAD NESTING: ' . $uri );
 						header( 'Location: ' . $redir );
 						die();
 					}
@@ -756,7 +756,7 @@ if (!class_exists('MRPListing')) {
             }
             
             $this->logger->debug( "page_by_slug: " . print_r( $page_by_slug, true ) );
-            //error_log( "page_by_slug: " . print_r( $page_by_slug, true ) );
+            // error_log( "page_by_slug: " . print_r( $page_by_slug, true ) );
 
             //if (count($result)) {
 			if( $page_by_slug ) {
@@ -772,7 +772,7 @@ if (!class_exists('MRPListing')) {
                 if (stripos($requestUri, '?')) {
                     $slug = substr($slug, 0, stripos($requestUri, '?') - 1);
                 }
-                //error_log( "DB RESULT: " . print_r( $result, true ) );
+                // error_log( "DB RESULT: " . print_r( $result, true ) );
                 $context = array(
                     "post_parent" => $result->ID,
                     "post_type"   => $result->post_type
@@ -840,7 +840,7 @@ if (!class_exists('MRPListing')) {
                 $url = substr($url, 0, stripos($url, '?'));
             }
 
-            //error_log( "processManagedUrl: ". $url );
+            // error_log( "processManagedUrl: ". $url );
 
             $regexes = $this->config && isset($this->config["managed_urls"]) ? $this->config["managed_urls"] : array();
             foreach ($regexes as $regex => $cachable) {
@@ -851,7 +851,7 @@ if (!class_exists('MRPListing')) {
                 	if( strpos( $ext, "/l/" ) == 0 ) {
 	                	$ext = str_replace( "/l/", "/", $ext );
                 	}
-                	//error_log( "processed extension: ". $ext );
+                	// error_log( "processed extension: ". $ext );
 
                     return array(
                         $this->stripLeadingSlash($matches["slug"]),
@@ -876,24 +876,24 @@ if (!class_exists('MRPListing')) {
             foreach ($regexes as $regex => $cached) {
                 if ($regex && preg_match("/$regex/i", $url)) {
                 	$this->debug( "Matched managed URL expression: ". $regex );
-                	//error_log( "Matched managed URL expression: ". $regex );
+                	// error_log( "Matched managed URL expression: ". $regex );
 
 		            // check that exactly this page exists and has a shortcode
 		            // e.g. /mls-search/ may be confused with /mls-R786555/ managed URL
 		            $urlpathonly = strtok($url,'?');
-		            //error_log( "URL PATH: " . $urlpathonly );
+		            // error_log( "URL PATH: " . $urlpathonly );
 		            $page_by_slug = get_page_by_path( $urlpathonly, OBJECT, 'page' );
-		            //error_log( 'LOOKED UP SLUG DOUBLE CHECKING MANAGED URL: ' . print_r( $page_by_slug, true ) );
+		            // error_log( 'LOOKED UP SLUG DOUBLE CHECKING MANAGED URL: ' . print_r( $page_by_slug, true ) );
 		            if( !$page_by_slug ) {
 			            $page_by_slug = get_page_by_path( $urlpathonly, OBJECT, 'post' );
-			            //error_log( 'LOOKED UP SLUG 2 LOOKED UP SLUG DOUBLE CHECKING MANAGED URL: ' . print_r( $page_by_slug, true ) );
+			            // error_log( 'LOOKED UP SLUG 2 LOOKED UP SLUG DOUBLE CHECKING MANAGED URL: ' . print_r( $page_by_slug, true ) );
 			            if( !$page_by_slug ) {
 							return true;
 						}
 					}
 
 					if ( isset($page_by_slug) /* && has_shortcode($page_by_slug->post_content, 'mrp') */) {
-						//error_log( "BAILING FROM SEEMINGLY MANAGED URL WHICH EXISTS AS PAGE / POST: " . $urlpath );
+						// error_log( "BAILING FROM SEEMINGLY MANAGED URL WHICH EXISTS AS PAGE / POST: " . $urlpath );
 						return false; // we thought we were managed URL; but a real page exists with shortcode
 					}
                 }
@@ -908,8 +908,8 @@ if (!class_exists('MRPListing')) {
             // do not allow URLs containing /1234.search/ it messes up google indexing
             if( preg_match( '@^.+/\d+\.search/.*@', $requestUri ) ) {
             	$redir = preg_replace( '@^(.+)/\d+\.search/(.*)@', '$1/', $requestUri );
-	            //error_log( "PREDEF REQUEST URI HIT : " . $requestUri );
-	            //error_log( "PREDEF REQUEST REDIRECT : " . $redir );
+	            // error_log( "PREDEF REQUEST URI HIT : " . $requestUri );
+	            // error_log( "PREDEF REQUEST REDIRECT : " . $redir );
 	            header("HTTP/1.1 301 Moved Permanently");
 	            header('Location: ' . $redir );
                 die();
@@ -941,7 +941,7 @@ if (!class_exists('MRPListing')) {
 
             // empty '/recip-xxx' or /recip-xxx/ -> redirect to /recip-xxx/idx.search
             if( preg_match( '@^/recip\-(\d+)[/]{0,1}$@', $requestUri, $matches ) ) {
-	            //error_log( "----------- HITT 000" );
+	            // error_log( "----------- HITT 000" );
 	            header('Location: /recip-' . $matches[1] . "/idx.search/" );
                 die();
             }
@@ -963,7 +963,7 @@ if (!class_exists('MRPListing')) {
 
             else if( preg_match('@^/recip-(\d+)/idx\.browse[/]{0,1}@', $requestUri, $matches) ) {
 
-	            //error_log( "--------------- HITT BROWSE" );
+	            // error_log( "--------------- HITT BROWSE" );
 	            require_once('fakepage.php');
                 $slug = substr($requestUri, 1);
                 if (stripos($requestUri, '/?')) {
@@ -980,7 +980,7 @@ if (!class_exists('MRPListing')) {
                 }
             }
             else if (preg_match('@^/recip-\d+@', $requestUri)) {
-	            //error_log( "--------------- HITT" );
+	            // error_log( "--------------- HITT" );
                 require_once('fakepage.php');
                 $slug = substr($requestUri, 1);
                 if (stripos($requestUri, '/?')) {
@@ -1013,7 +1013,7 @@ if (!class_exists('MRPListing')) {
                 return;
             }
 
-            //error_log( "INLINE ROOT IN PROXY: " . $_SERVER['HTTP_MRPINLINEROOT'] );
+            // error_log( "INLINE ROOT IN PROXY: " . $_SERVER['HTTP_MRPINLINEROOT'] );
 
 
 			$context = new \MRPIDX\Context(
@@ -1033,10 +1033,10 @@ if (!class_exists('MRPListing')) {
 				if( $inqueryString ) {
 					$requestUri .= "?" . $inqueryString;
 				}
-	        	//error_log( "IDX_SEARCH URL: " . $requestUri );
+	        	// error_log( "IDX_SEARCH URL: " . $requestUri );
             }
 
-            //error_log("Direct Proxying: " . $requestUri);
+            // error_log("Direct Proxying: " . $requestUri);
 
             //  use raw POST data from stdin rather than the $_POST superglobal
             $client->proxy(
@@ -1123,7 +1123,7 @@ if (!class_exists('MRPListing')) {
 
             if ($this->isManagedUrl($url)) {
                 list($pageName, $extension) = $this->processManagedUrl($url);
-                //error_log( $pageName . ":" . $extension . ":" . $url );
+                // error_log( $pageName . ":" . $extension . ":" . $url );
             }
 
 
@@ -1204,7 +1204,7 @@ if (!class_exists('MRPListing')) {
                 $json = json_decode($content,true);
                 if (json_last_error() != JSON_ERROR_NONE) {
                     //$this->logger->warn("Config JSON is invalid: " . self::CONFIG_LOCATION);
-                    //error_log("Config JSON is invalid: " . self::CONFIG_LOCATION . " : " . json_last_error() );
+                    // error_log("Config JSON is invalid: " . self::CONFIG_LOCATION . " : " . json_last_error() );
                     return;
                 }
                 $config = $json;
@@ -1218,7 +1218,7 @@ if (!class_exists('MRPListing')) {
                     $this->logger->debug("Updating config from " . $current . " to " . $config["version"]);
                 }
                 else {
-	                //error_log( "Config update skipped: version same or lower: " . $config["version"] );
+	                // error_log( "Config update skipped: version same or lower: " . $config["version"] );
                 }
             } else {
                 $this->logger->warn("Could not update configuration from: " . self::CONFIG_LOCATION);

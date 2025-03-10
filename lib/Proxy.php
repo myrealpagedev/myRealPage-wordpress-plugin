@@ -31,7 +31,7 @@ class Proxy {
             "X-Real-IP: " . ( isset( $_SERVER["REMOTE_ADDR"] ) ? $_SERVER["REMOTE_ADDR"] : "-" ),
             "X-WordPress-Theme: " . get_template()
         );
-        //error_log( 'PROXY MRP INLINE ROOT: ' . $_SERVER['HTTP_MRPINLINEROOT'] );
+        // error_log( 'PROXY MRP INLINE ROOT: ' . $_SERVER['HTTP_MRPINLINEROOT'] );
         if( isset( $_SERVER['HTTP_MRPINLINEROOT'] ) ) {
 	        $this->defaultHeaders[] = 'MrpInlineRoot: ' . $_SERVER['HTTP_MRPINLINEROOT'];
         }
@@ -72,7 +72,7 @@ class Proxy {
         $response = $this->proxy($uri, $postParams);
 
         if( $response ) {
-	        error_log( 'PROXY RESPONSE: ' . $response->getResponseCodeWithString() );
+	        // error_log( 'PROXY RESPONSE: ' . $response->getResponseCodeWithString() );
         }
 
         // handle redirects
@@ -152,7 +152,7 @@ $content = str_replace(
 			parse_str(strtr($cookie, array('&' => '%26', '+' => '%2B', ';' => '&')), $parsed);
 			if( isset($parsed['mrp_sort']) && $parsed['mrp_sort']) {
 				$mod_sorted_cookie = "mrp_sort=" . $parsed["mrp_sort"] . "; Path=/";
-				error_log( "SORT COOKIE: " . $mod_sorted_cookie );
+				// error_log( "SORT COOKIE: " . $mod_sorted_cookie );
 				header( "Set-Cookie:" . $mod_sorted_cookie, false );
 			}
 			else {
@@ -160,7 +160,7 @@ $content = str_replace(
 				header( "Set-Cookie:" . $cookie, false );
 			}
         }
-        //error_log( "COOKIES: " . print_r( $response->getCookies(), true ));
+        // error_log( "COOKIES: " . print_r( $response->getCookies(), true ));
     }
 
     /**
@@ -200,7 +200,7 @@ $content = str_replace(
             $headers[] = 'X-Mrp-GoogleMapKey: ' . $context->getGoogleMapApiKey();
         }
 
-        //error_log( $uri . " -> X-Requested-With: " . $_SERVER['HTTP_X_REQUESTED_WITH'] );
+        // error_log( $uri . " -> X-Requested-With: " . $_SERVER['HTTP_X_REQUESTED_WITH'] );
 
         // custom header passing
         if( isset( $_SERVER['HTTP_X_REQUESTED_WITH'] ) && $_SERVER['HTTP_X_REQUESTED_WITH'] ) {
@@ -235,7 +235,7 @@ $content = str_replace(
             $headers[] = $this->getCookieAsHeader();
         }
 
-        error_log( "PROXY HEADERS: (" . $uri . ") " . print_r( $headers, true ) );
+        // error_log( "PROXY HEADERS: (" . $uri . ") " . print_r( $headers, true ) );
 
         $client->setHeaders($headers);
         // OLD if (count($postParams)) {

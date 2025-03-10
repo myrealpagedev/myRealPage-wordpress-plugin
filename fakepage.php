@@ -169,7 +169,7 @@ class FakePage
          * Check if the requested page matches our target
          */
 
-        //error_log( "dbg__ detectPosts: " . strtolower($wp->request) . " |" . strtolower($this->page_slug) . " | " . $wp->query_vars['page_id'] . " | " . $this->page_slug );
+        // error_log( "dbg__ detectPosts: " . strtolower($wp->request) . " |" . strtolower($this->page_slug) . " | " . $wp->query_vars['page_id'] . " | " . $this->page_slug );
 
 
         if ( 1 || strtolower($wp->request) == strtolower($this->page_slug) || $wp->query_vars['page_id'] == $this->page_slug){

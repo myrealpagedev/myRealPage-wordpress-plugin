@@ -95,8 +95,8 @@ class InlineClient {
 
 		$this->logger->debug("Context: " . print_r($this->context->getAllValues(), true));
 
-//error_log( "DEST URL: ". $this->generateUrl());
-//error_log( "DEST HEADERS: ". print_r( $this->headers, true ) );
+        // error_log( "DEST URL: ". $this->generateUrl());
+        // error_log( "DEST HEADERS: ". print_r( $this->headers, true ) );
 
         $this->client = new Client($this->generateUrl(), array("headers" => $this->headers));
     }
@@ -122,7 +122,7 @@ class InlineClient {
         // add MrpInlineRoot header
         $pageName = $this->context->getPageName();
         if (strlen($pageName)) {
-	        //error_log( '------- PAGE NAME: ' . $pageName );
+	        // error_log( '------- PAGE NAME: ' . $pageName );
             $client->setHeader("MrpInlineRoot", "/" . $pageName . "/");
         } else {
             $client->setHeader("MrpInlineRoot", "/");
@@ -130,7 +130,7 @@ class InlineClient {
 
         $this->client = $client;
         $this->logger->debug("Request headers: " . print_r($client->getHeaders(), true));
-        //error_log("Request headers: " . print_r($client->getHeaders(), true));
+        // error_log("Request headers: " . print_r($client->getHeaders(), true));
 
 
         if( $_SERVER['REQUEST_METHOD'] == 'POST' ) {
@@ -141,8 +141,8 @@ class InlineClient {
         $client->makeRequest();
         $response = $client->getResponse();
 
-        //error_log( "RESPONSE_HEADERS RAW: " . print_r( $response->getHeaders(), true ) );
-		//error_log( "CONTENT: ". $response->getRawContent() );
+        // error_log( "RESPONSE_HEADERS RAW: " . print_r( $response->getHeaders(), true ) );
+		// error_log( "CONTENT: ". $response->getRawContent() );
 
         // set raw content in case we need it later
         $this->setInlineContent("raw", $response->getRawContent());
@@ -183,19 +183,19 @@ class InlineClient {
 
             if (!$response->hasHeader("Location")) {
                 // redirect with no location header
-                error_log( "no location: " . $response->getHeader('Location') );
+                // error_log( "no location: " . $response->getHeader('Location') );
                 return;
             }
 
             // root the the location to the local site
             $location = $response->getHeader('Location');
-            //error_log( "REDIRECT: " . $location );
+            // error_log( "REDIRECT: " . $location );
             $location = preg_replace('@https://(.+?)/(.*)@', ( $this->isSecure() ? 'https://' : 'http://' ) .$_SERVER['HTTP_HOST'].'/$2', $location);
 
             if( substr( $location, -1 ) != "/" ) {
 	            $location .= "/";
             }
-            //error_log( "REDIRECT2: " . $location );
+            // error_log( "REDIRECT2: " . $location );
             $this->client->setResponseHeader("Location", $location);
         }
     }
@@ -347,7 +347,7 @@ class InlineClient {
             	if( $name != "Set-Cookie" && ( $name == "Cache-Control" || $name == "Expires" ) ) {
             		// we process cookies separately, due to there being multiple headers
 					$this->logger->debug("Setting header: " . $name . ": " . $value);
-					//error_log( "Setting header: " . $name . ": " . $value);
+					// error_log( "Setting header: " . $name . ": " . $value);
 					header($name . ": " . $value, true);
             	}
             }
@@ -374,7 +374,7 @@ class InlineClient {
 			parse_str(strtr($cookie, array('&' => '%26', '+' => '%2B', ';' => '&')), $parsed);
 			if( isset($parsed['mrp_sort']) && $parsed['mrp_sort']) {
 				$mod_sorted_cookie = "mrp_sort=" . $parsed["mrp_sort"] . "; Path=/";
-				error_log( "SORT COOKIE: " . $mod_sorted_cookie );
+				// error_log( "SORT COOKIE: " . $mod_sorted_cookie );
 				header( "Set-Cookie:" . $mod_sorted_cookie, false );
 			}
 			else {
@@ -514,7 +514,7 @@ class InlineClient {
 
 
         $this->logger->debug("Target MRP URL: " . $url );
-        //error_log("Target MRP URL: " . $url );
+        // error_log("Target MRP URL: " . $url );
 
         return $url;
     }
