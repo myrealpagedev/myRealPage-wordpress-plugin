@@ -652,7 +652,7 @@ if (!class_exists('MRPListing')) {
                 	"/wps/rest/" . $attrs["account_id"] . "/l/recip/tmpl2.js'></script>\n";
                 $script2 = "<script src='//" . \MRPIDX\InlineClient::RES_SERVER .
                 	"/wps/js/ng/v2/listings/listings-wp-button.js' id='idx-button-script' data-account='" .
-                		$attrs["account_id"] . "' data-init-attr='" . ($attrs["init_attr"] ? $attrs["init_attr"] : "" ) . "'></script>\n";
+                		$attrs["account_id"] . "' data-init-attr='" . (isset($attrs["init_attr"]) ? $attrs["init_attr"] : "" ) . "'></script>\n";
 
                 return $script1 . $script2;
 
